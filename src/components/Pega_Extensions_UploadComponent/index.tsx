@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { withConfiguration, Table } from '@pega/cosmos-react-core';
 import { AppAnnouncement as PegaAppAnnouncement } from '@pega/cosmos-react-work';
 import type { PConnFieldProps } from './PConnProps';
-import FileUpload from './FileUpload';
+// import FileUpload from './FileUpload';
+import PegaDXPlayground from './PegaDXPlayground';
 
 import StyledPegaExtensionsUploadComponentWrapper from './styles';
 
@@ -51,12 +52,12 @@ function PegaExtensionsUploadComponent(props: PegaExtensionsUploadComponentProps
   // to get getContextName
   useEffect(() => {
 
-    const imagePath = getPConnect().getImagePath('b8d31e98-8549-453f-9d14-ea7279e298f0');
+    // const imagePath = getPConnect().getImagePath('b8d31e98-8549-453f-9d14-ea7279e298f0');
     // eslint-disable-next-line no-console
-    console.log('imagePath', imagePath);
-    setImg(imagePath);
+    // console.log('imagePath', imagePath);
+    // setImg(imagePath);
     // eslint-disable-next-line no-console
-    console.log('img', img);
+    // console.log('img', img);
 
     PCore.getDataApiUtils()
       .getData(dataViewName, {}, context)
@@ -112,7 +113,7 @@ function PegaExtensionsUploadComponent(props: PegaExtensionsUploadComponentProps
       loadingMessage={PConnect.getLocalizedValue('Loading Work list', '', '')}
     />
     <img src={`blob:${img}`} alt='ii' />
-    <FileUpload context={context} />
+    <PegaDXPlayground />
     </StyledPegaExtensionsUploadComponentWrapper>
   );
 

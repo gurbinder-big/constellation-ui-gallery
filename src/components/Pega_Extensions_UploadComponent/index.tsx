@@ -1,9 +1,10 @@
+/* eslint-disable */
 import { useEffect, useState } from 'react';
 import { withConfiguration, Table } from '@pega/cosmos-react-core';
 import { AppAnnouncement as PegaAppAnnouncement } from '@pega/cosmos-react-work';
 import type { PConnFieldProps } from './PConnProps';
 // import FileUpload from './FileUpload';
-import PegaDXPlayground from './PegaDXPlayground';
+// import PegaDXPlayground from './PegaDXPlayground';
 
 import StyledPegaExtensionsUploadComponentWrapper from './styles';
 
@@ -113,7 +114,6 @@ function PegaExtensionsUploadComponent(props: PegaExtensionsUploadComponentProps
       loadingMessage={PConnect.getLocalizedValue('Loading Work list', '', '')}
     />
     <img src={`blob:${img}`} alt='ii' />
-    <PegaDXPlayground />
     </StyledPegaExtensionsUploadComponentWrapper>
   );
 

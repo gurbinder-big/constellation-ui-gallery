@@ -1,0 +1,34 @@
+{
+  "name": "Pega_Extensions_ActionButton",
+  "label": "Actionable button",
+  "description": "Actionable button",
+  "organization": "Pega",
+  "version": "1.0.0",
+  "library": "Extensions",
+  "allowedApplications": [],
+  "componentKey": "Pega_Extensions_ActionButton",
+  "type": "Field",
+  "subtype": "Text",
+  "properties": [
+    {
+      "name": "dataPageName",
+      "label": "Data page name",
+      "format": "TEXT",
+      "required": true
+    },
+    {
+      "name": "localAction",
+      "label": "Local Action ID",
+      "format": "TEXT"
+    },
+    {
+      "name": "visibility",
+      "label": "Visible",
+      "format": "VISIBILITY"
+    }
+  ],
+  "defaultConfig": {
+    "label": "@L $this.label",
+    "localAction": ""
+  }
+}

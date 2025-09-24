@@ -1,10 +1,9 @@
+import { useState } from 'react';
 import { withConfiguration, Flex, Button } from '@pega/cosmos-react-core';
 
 type ActionableButtonProps = {
   label: string;
   dataPageName: string;
-  context: string;
-  payload?: Record<string, any>;
 };
 
 type FetchDataPageResult = {
@@ -14,13 +13,12 @@ type FetchDataPageResult = {
 const fetchDataPage = async (
   dataPageName: string,
   context: string,
-  payload: Record<string, any> = {}
+  payload: Record<string, any> = {},
+  options: Record<string, any> = {}
 ): Promise<FetchDataPageResult> => {
   try {
-    const response = await PCore.getDataApiUtils().getData(dataPageName, payload, context);
-    // eslint-disable-next-line no-console
-    console.log(response);
-    return response.data || {};
+    const response = await PCore.getDataPageUtils().getPageDataAsync(dataPageName, context, payload, options);
+    return response || {};
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(`Error fetching data for ${dataPageName}:`, error);
@@ -29,18 +27,24 @@ const fetchDataPage = async (
 };
 
 export const PegaExtensionsActionButton = (props: ActionableButtonProps) => {
-  const { label, dataPageName, context, payload = {} } = props;
+  const { label, dataPageName } = props;
+  const [data, setData] = useState<FetchDataPageResult | null>(null);
+
+  const context = 'app/primary_1';
 
   const handleClick = async () => {
-    const result = await fetchDataPage(dataPageName, context, payload);
-    // For now, just log the data — can be extended to update state or trigger further actions
-    // eslint-disable-next-line no-console
-    console.log('Fetched Data Page Result:', result);
+    const result = await fetchDataPage(dataPageName, context, {}, {});
+    setData(result); // store fetched data in state
   };
 
   return (
-    <Flex container={{ direction: 'row' }}>
-      <Button onClick={handleClick}>{label}</Button>
+    <Flex container={{ direction: 'column', gap: 10 }}>
+      <Button onClick={handleClick} style={{ width: '150px' }}>{label}</Button>
+      {data && (
+        <pre style={{ background: '#f5f5f5', padding: '10px', borderRadius: '4px', overflowX: 'auto' }}>
+          {JSON.stringify(data, null, 2)}
+        </pre>
+      )}
     </Flex>
   );
 };

@@ -7,8 +7,8 @@
   "library": "Extensions",
   "allowedApplications": [],
   "componentKey": "Pega_Extensions_ActionButton",
-  "type": "Field",
-  "subtype": "Text",
+  "type": "Widget",
+  "subtype": ["PAGE", "CASE"],
   "properties": [
     {
       "name": "dataPageName",
@@ -17,18 +17,9 @@
       "required": true
     },
     {
-      "name": "localAction",
-      "label": "Local Action ID",
+      "name": "label",
+      "label": "Label",
       "format": "TEXT"
-    },
-    {
-      "name": "visibility",
-      "label": "Visible",
-      "format": "VISIBILITY"
     }
-  ],
-  "defaultConfig": {
-    "label": "@L $this.label",
-    "localAction": ""
-  }
+  ]
 }

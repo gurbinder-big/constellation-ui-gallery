@@ -1,0 +1,33 @@
+{
+  "name": "MyCo_MyComponents_MyLocalActionLauncher",
+  "label": "My Local Action Launcher",
+  "description": "My Local Action Launcher",
+  "organization": "MyCo",
+  "version": "01.01.01",
+  "library": "MyComponents",
+  "allowedApplications": [],
+  "componentKey": "MyCo_MyComponents_MyLocalActionLauncher",
+  "type": "Field",
+  "subtype": "Text-URL",
+  "properties": [
+    {
+      "name": "buttonText",
+      "label": "Button Text",
+      "format": "TEXT",
+      "required": true
+    },
+    {
+      "name": "actionId",
+      "label": "Action ID",
+      "format": "TEXT",
+      "required": true
+    },
+    {
+      "name": "testId",
+      "label": "Test ID",
+      "format": "TEXT"
+    }
+  ],
+  "defaultConfig": {
+  }
+}

@@ -1,7 +1,7 @@
 import { withConfiguration, Banner } from '@pega/cosmos-react-core';
 import { useCallback, useEffect, useState } from 'react';
 import MainContent from './styles';
-import '../create-nonce';
+import '../shared/create-nonce';
 
 type BannerProps = {
   /** Display type of rendering
@@ -138,10 +138,11 @@ export const PegaExtensionsBanner = (props: BannerProps) => {
           .catch(() => {});
       }
     },
-    [dataPage, getPConnect, refreshForm],
+
+    [],
   );
 
-  /* Subscribe to changes to the assignment case */
+  /* Initial Load of the content - Subscribe to changes to the assignment case */
   useEffect(() => {
     const caseID = getPConnect().getValue((window as any).PCore.getConstants().CASE_INFO.CASE_INFO_ID);
     const filter = {
@@ -157,14 +158,11 @@ export const PegaExtensionsBanner = (props: BannerProps) => {
       },
       getPConnect().getContextName(),
     );
+    loadMessages();
     return () => {
       (window as any).PCore.getMessagingServiceManager().unsubscribe(attachSubId);
     };
-  }, [getPConnect, loadMessages]);
-
-  useEffect(() => {
-    loadMessages();
-  }, [dataPage, getPConnect, loadMessages]);
+  }, []);
 
   const onDismiss = () => {
     setIsDismissed(true);

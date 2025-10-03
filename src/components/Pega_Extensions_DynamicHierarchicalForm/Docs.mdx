@@ -1,4 +1,4 @@
-import { Meta, Primary, Controls, Story } from '@storybook/blocks';
+import { Meta, Primary, Controls, Story } from '@storybook/addon-docs/blocks';
 import * as DemoStories from './demo.stories';
 
 <Meta of={DemoStories} />
@@ -15,6 +15,8 @@ The component is divided into two distinct regions:
 - The 'Tabs' region: This is where all the embedded data fields should be placed, leading to the view that will be rendered for object. The RuleClass field from the item should match the class of the embedded data object.
 
 The component also exposes an action that will trigger a refresh on the assignment - This action can be used to update parts of the assignment, for example provide a detailed quotation. It is also possible to hide this refresh action as well as the multi-select picklist.
+
+Note: This component only supports objects of different classes and will not work if the objects are of the same class.
 
 <Primary />
 

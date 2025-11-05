@@ -310,12 +310,26 @@ function ExportComponentV2(props: DashboardProps) {
         const result = Object.entries(uploadedTableValues).map(([key, value]) => ({
           [key]: { selectedvalue: value }
         }));
-        parameters = { ...parameters, data: result };
+        parameters = { ...parameters, data: JSON.stringify(result) };
       }
 
       if (selectedMode.toLowerCase() === 'kafka' && selectedTarget.toLowerCase() === 'databricks') {
         dataPageName = kafkaDataBricksSaveDataPage;
-        parameters = { ...parameters, DataBricksConfig: dataBricksValues };
+
+        const result = Object.fromEntries(
+          Object.entries(dataBricksValues).map(([outerKey, innerObj]) => [
+            outerKey,
+            Object.fromEntries(
+              Object.entries(innerObj).map(([innerKey, value]) => [
+                innerKey,
+                { selectedvalue: value }
+              ])
+            )
+          ])
+        );
+
+
+        parameters = { ...parameters, data: JSON.stringify(result) };
 
         // const transformedConfig = Object.values(dataBricksValues)
         //   .flatMap((columns: Record<string, string>) =>
@@ -326,11 +340,6 @@ function ExportComponentV2(props: DashboardProps) {
 
         // console.log(dataBricksValues);
         // console.log(transformedConfig);
-
-        parameters = {
-          ...parameters,
-          data: dataBricksValues
-        };
       }
 
       const res = await fetchPageDataPage(dataPageName, context, parameters, {});

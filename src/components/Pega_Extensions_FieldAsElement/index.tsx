@@ -1,4 +1,4 @@
-import { withConfiguration, Flex, Button } from '@pega/cosmos-react-core';
+import { withConfiguration, Flex } from '@pega/cosmos-react-core';
 import '../create-nonce';
 
 type ActionableNewButtonProps = {
@@ -13,6 +13,7 @@ export const PegaExtensionsFieldAsElement = (props: ActionableNewButtonProps) =>
     const availableActions =
       getPConnect().getValue((window as any).PCore.getConstants().CASE_INFO.AVAILABLEACTIONS) || [];
     // const targetAction = availableActions.find((action: { ID: string }) => action.ID === localAction);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const LaunchLocalAction = async () => {
       // eslint-disable-next-line no-console
       console.log('okkkk');
@@ -33,7 +34,7 @@ export const PegaExtensionsFieldAsElement = (props: ActionableNewButtonProps) =>
     };
     return (
       <Flex container={{ direction: 'row' }}>
-        <Button onClick={LaunchLocalAction}> Press me </Button>
+        <p> its a text </p>
       </Flex>
     );
   }

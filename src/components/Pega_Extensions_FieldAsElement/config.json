@@ -1,15 +1,26 @@
 {
-  "name": "Pega_ConstellationUIGallery_FieldAsElement",
+  "name": "Pega_Extensions_FieldAsElement",
   "label": "Field as Element",
   "description": "Field as Element",
   "organization": "Pega",
-  "version": "0.0.1",
-  "library": "ConstellationUIGallery",
+  "version": "1.0.0",
+  "library": "Extensions",
   "allowedApplications": [],
-  "componentKey": "Pega_ConstellationUIGallery_FieldAsElement",
+  "componentKey": "Pega_Extensions_FieldAsElement",
   "type": "Field",
   "subtype": "Text",
-  "properties": [],
+  "properties": [
+    {
+      "name": "value",
+      "label": "Value",
+      "format": "TEXT"
+    },
+    {
+      "name": "localAction",
+      "label": "Local Action ID",
+      "format": "TEXT"
+    }
+  ],
   "defaultConfig": {
     "label": "@L $this.label",
     "localAction": ""

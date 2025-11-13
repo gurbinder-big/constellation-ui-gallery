@@ -57,8 +57,10 @@ interface DashboardProps extends PConnFieldProps {
   targetSystemDataPage: string;
   extractRuleDataPage: string;
   treeViewDataPage: string;
-  loadTableStructureDataPage: string;
+  loadDatabrickStructureDataPage: string;
+  snowflakeTableStructureDataPage: string;
   kafkaDataBricksSaveDataPage: string;
+  kafkaSnowflakeSaveDataPage: string;
   kafkaJsonSaveDataPage: string;
 }
 
@@ -66,13 +68,15 @@ function ExportComponentV2(props: DashboardProps) {
   const {
     getPConnect,
     caseTypesDataPage,
-    loadTableStructureDataPage,
+    loadDatabrickStructureDataPage,
     autoCompleteDataPage,
     exportDetailsDataPage,
     targetSystemDataPage,
     extractRuleDataPage,
     treeViewDataPage,
     kafkaDataBricksSaveDataPage,
+    kafkaSnowflakeSaveDataPage,
+    snowflakeTableStructureDataPage,
     kafkaJsonSaveDataPage
   } = props;
 
@@ -99,11 +103,13 @@ function ExportComponentV2(props: DashboardProps) {
   const [treeData, setTreeData] = useState<any>(null);
   // const [nodes, setNodes] = useState<TreeNode[]>([]);
   const [dataBricksForm, setDataBricksForm] = useState<any>(null);
+  const [snowFlakeForm, setSnowFlakeForm] = useState<any>(null);
 
   const [fileContent, setFileContent] = useState<any>(null);
   const [uploadedTable, setUploadedTable] = useState<any>(null);
   const [uploadedTableValues, setUploadedTableValues] = useState<Record<string, any>>({});
   const [dataBricksValues, setDataBricksValues] = useState<Record<string, Record<string, string>>>({});
+  const [snowFlakeValues, setSnowFlakeValues] = useState<Record<string, Record<string, string>>>({});
 
   const handleUploadedTableChange = (columnName: string, value: any) => {
     console.log('Selected:', columnName, value);
@@ -116,6 +122,16 @@ function ExportComponentV2(props: DashboardProps) {
 
   const handleDataBricksChange = (tableName: string, columnName: string, value: string) => {
     setDataBricksValues(prev => ({
+      ...prev,
+      [tableName]: {
+        ...(prev[tableName] || {}),
+        [columnName]: value
+      }
+    }));
+  };
+
+  const handleSnowFlakeChange = (tableName: string, columnName: string, value: string) => {
+    setSnowFlakeValues(prev => ({
       ...prev,
       [tableName]: {
         ...(prev[tableName] || {}),
@@ -288,6 +304,28 @@ function ExportComponentV2(props: DashboardProps) {
     loadExtractRules();
   }, [selectedCaseType, selectedTarget, extractRuleDataPage, context]);
 
+  function modifyJson(data: Record<string, Record<string, string>>) {
+    return Object.entries(data)
+      .map(([tableName, columns]) => {
+        const colArray = Object.entries(columns as Record<string, string>).map(
+          ([name, type]) => ({
+            name,
+            type
+          })
+        );
+
+        return JSON.stringify(
+          {
+            tableName,
+            columns: colArray
+          },
+          null,
+          2
+        );
+      })
+      .join('<');
+  }
+
   async function submit() {
     try {
       let parameters: Record<string, any> = {
@@ -315,31 +353,16 @@ function ExportComponentV2(props: DashboardProps) {
 
       if (selectedMode.toLowerCase() === 'kafka' && selectedTarget.toLowerCase() === 'databricks') {
         dataPageName = kafkaDataBricksSaveDataPage;
+        const data = modifyJson(dataBricksValues);
+        console.log('resultString', data);
+        parameters = { ...parameters, data };
+      }
 
-        const result = Object.fromEntries(
-          Object.entries(dataBricksValues).map(([outerKey, innerObj]) => [
-            outerKey,
-            Object.fromEntries(
-              Object.entries(innerObj).map(([innerKey, value]) => [
-                innerKey,
-                { selectedvalue: value }
-              ])
-            )
-          ])
-        );
-
-
-        parameters = { ...parameters, data: JSON.stringify(result) };
-
-        // const transformedConfig = Object.values(dataBricksValues)
-        //   .flatMap((columns: Record<string, string>) =>
-        //     Object.entries(columns).map(([field, value]) => ({
-        //       [field]: { selectedvalue: value }
-        //     }))
-        //   );
-
-        // console.log(dataBricksValues);
-        // console.log(transformedConfig);
+      if (selectedMode.toLowerCase() === 'kafka' && selectedTarget.toLowerCase() === 'snowflake') {
+        dataPageName = kafkaSnowflakeSaveDataPage;
+        const data = modifyJson(snowFlakeValues);
+        console.log('resultString', data);
+        parameters = { ...parameters, data };
       }
 
       const res = await fetchPageDataPage(dataPageName, context, parameters, {});
@@ -423,7 +446,7 @@ function ExportComponentV2(props: DashboardProps) {
             }
           };
 
-          const res = await fetchDataPage(loadTableStructureDataPage, context, payload);
+          const res = await fetchDataPage(loadDatabrickStructureDataPage, context, payload);
           setDataBricksForm(res?.data);
           /* eslint-disable no-console */
           console.log('Loaded DataBricks Form Config:', res?.data);
@@ -437,7 +460,35 @@ function ExportComponentV2(props: DashboardProps) {
     }
 
     loadDataBricksForm();
-  }, [selectedCaseType, selectedMode, selectedTarget, loadTableStructureDataPage, context]);
+  }, [selectedCaseType, selectedMode, selectedTarget, loadDatabrickStructureDataPage, context]);
+
+
+  useEffect(() => {
+    async function loadSnowflakeForm() {
+      if (selectedMode.toLowerCase() === 'kafka' && selectedTarget.toLowerCase() === 'snowflake') {
+        try {
+          const payload = {
+            dataViewParameters: {
+              'CaseTypeName': selectedCaseType,
+              'TargetSystem': selectedTarget
+            }
+          };
+
+          const res = await fetchDataPage(snowflakeTableStructureDataPage, context, payload);
+          setSnowFlakeForm(res?.data);
+          /* eslint-disable no-console */
+          console.log('Loaded DataBricks Form Config:', res?.data);
+        } catch (err) {
+          /* eslint-disable no-console */
+          console.error('Error loading DataBricks form config:', err);
+        }
+      } else {
+        setSnowFlakeForm(null);
+      }
+    }
+    loadSnowflakeForm();
+  }, [selectedCaseType, selectedMode, selectedTarget, snowflakeTableStructureDataPage, context]);
+
 
   if (isLoading) return <div style={{ padding: 16 }}>Loading data...</div>;
 
@@ -458,6 +509,7 @@ function ExportComponentV2(props: DashboardProps) {
       setExtractRules([]);
       setUploadedTable(null);
       setDataBricksForm(null);
+      setSnowFlakeForm(null);
     }
 
     if (level === 'mode') {
@@ -467,6 +519,7 @@ function ExportComponentV2(props: DashboardProps) {
       setExtractRules([]);
       setUploadedTable(null);
       setDataBricksForm(null);
+      setSnowFlakeForm(null);
     }
 
     if (level === 'target') {
@@ -475,8 +528,28 @@ function ExportComponentV2(props: DashboardProps) {
       setExtractRules([]);
       setUploadedTable(null);
       setDataBricksForm(null);
+      setSnowFlakeForm(null);
     }
   };
+
+
+  const handleHiddenClick = () => {
+    PCore.getRestClient().invokeRestApi('updateDataObject',{
+      queryPayload: {
+        data_view_ID: 'D_SaveDataTestGurb'
+      },
+      body: { name : 'dxxComponent' }
+    })
+    .then((res) => {
+      /* eslint-disable no-console */
+      console.log('Hidden button response:', res);
+    })
+    .catch((err) => {
+      /* eslint-disable no-console */
+      console.error('Error in hidden call:', err);
+    });
+  }
+
 
   return (
     <DashboardWrapper>
@@ -823,6 +896,80 @@ function ExportComponentV2(props: DashboardProps) {
           </>
         )}
 
+        {(selectedMode.toLowerCase() === 'kafka' && selectedTarget.toLowerCase() === 'snowflake') && (
+          <>
+            <h3 style={{ marginBottom: '15px' }}>Snowflake Table Configuration</h3>
+
+            {!snowFlakeForm || snowFlakeForm.length === 0 ? (
+              <div>Loading configuration ...</div>
+            ) : (
+              snowFlakeForm.map((table: any, tableIndex: number) => (
+                <div
+                  key={tableIndex}
+                  style={{
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    padding: '20px',
+                    marginBottom: '24px',
+                    backgroundColor: '#ffffff',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.06)',
+                  }}
+                >
+                  <h3
+                    style={{
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      color: '#111827',
+                      marginBottom: '16px',
+                      borderBottom: '1px solid #e5e7eb',
+                      paddingBottom: '4px',
+                      textTransform: 'capitalize'
+                    }}
+                  >
+                    {table.physicalTableName}
+                  </h3>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '12px'
+                    }}
+                  >
+                    {table.columns?.map((col: any, colIndex: number) => (
+                      <div
+                        key={`${table.physicalTableName}-${col.name}-${colIndex}`}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px'
+                        }}
+                      >
+                      {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+                        <label
+                          style={{
+                            flex: '0 0 35%',
+                            fontWeight: 500,
+                            color: '#374151'
+                          }}
+                        >
+                          {col.name}
+                        </label>
+                        <div style={{ flex: 1 }}>
+                          <Autocomplete
+                            options={autoCompleteFields}
+                            onSelect={(value) => handleSnowFlakeChange(table.physicalTableName, col.name, value)}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))
+            )}
+          </>
+        )}
+
 
         {
           selectedTarget && selectedMode.toLowerCase() !== 'kafka' && (
@@ -872,7 +1019,20 @@ function ExportComponentV2(props: DashboardProps) {
         </button>
 
 
+
+        <button
+          id="hidden-trigger"
+          type="button"
+          style={{ display: 'none' }}
+          onClick={handleHiddenClick}
+        >
+          Hidden Trigger
+        </button>
+
+
       </div>
+
+
     </DashboardWrapper>
   );
 }

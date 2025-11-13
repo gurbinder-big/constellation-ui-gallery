@@ -6,8 +6,10 @@ const configProps = {
   extractRuleDataPage: 'extractRuleDataPage',
   treeViewDataPage: 'treeViewDataPage',
   autoCompleteDataPage: 'autoCompleteDataPage',
-  loadTableStructureDataPage: 'loadTableStructureDataPage',
+  loadDatabrickStructureDataPage: 'loadDatabrickStructureDataPage',
+  snowflakeTableStructureDataPage: 'snowflakeTableStructureDataPage',
   kafkaDataBricksSaveDataPage: 'kafkaDataBricksSaveDataPage',
+  kafkaSnowflakeSaveDataPage: 'kafkaSnowflakeSaveDataPage',
   kafkaJsonSaveDataPage: 'kafkaJsonSaveDataPage'
 };
 

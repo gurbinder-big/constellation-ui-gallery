@@ -11,6 +11,11 @@
   "subtype": "Text",
   "properties": [
     {
+      "name": "dataPageForCaseInfo",
+      "label": "Data page for Case Info (Should be of page type)",
+      "format": "TEXT"
+    },
+    {
       "name": "value",
       "label": "Value",
       "format": "TEXT"

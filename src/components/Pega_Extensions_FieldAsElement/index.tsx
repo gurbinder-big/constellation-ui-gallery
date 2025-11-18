@@ -1,6 +1,6 @@
 import { withConfiguration } from '@pega/cosmos-react-core';
 import parse from 'html-react-parser';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { fetchPageDataPage } from './apiUtils';
 import '../create-nonce';
 import styled from 'styled-components';
@@ -23,46 +23,88 @@ type ActionableNewButtonProps = {
 
 export const PegaExtensionsFieldAsElement = (props: ActionableNewButtonProps) => {
   const { getPConnect, value, localAction, dataPageForCaseInfo } = props;
-  const [htmlData, setHtmlData] = useState<any>(null);
+
+  const [htmlData, setHtmlData] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const caseInfo = useMemo(() => {
     return (
       getPConnect().getValue(
         (window as any).PCore.getConstants().CASE_INFO.CASE_INFO
-      ) || []
+      ) || {}
     );
   }, [getPConnect]);
 
-  // const caseData = (window as any).PCore.getDataApiUtils().getCaseEditMetadata(caseInfo?.ID, getPConnect().getContextName())
 
+  /**
+   * 📌 Load HTML from Data Page
+   */
   useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log(caseInfo);
-
     async function loadData() {
-      const parameters = {
-        CaseKey: caseInfo?.ID,
-      };
-      const res = await fetchPageDataPage(dataPageForCaseInfo, getPConnect().getContextName(), parameters, {});
-      // eslint-disable-next-line no-console
-      console.log(res);
-      setHtmlData(res.FinalStreamData);
+      const parameters = { CaseKey: caseInfo?.ID };
+
+      const res = await fetchPageDataPage(
+        dataPageForCaseInfo,
+        getPConnect().getContextName(),
+        parameters,
+        {}
+      );
+
+      setHtmlData(res.FinalStreamData || '<p>No DisplayHTML content available</p>');
     }
-    loadData();
+
+    if (caseInfo?.ID) loadData();
   }, [caseInfo, dataPageForCaseInfo, getPConnect]);
 
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
 
-  if (value && localAction) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const availableActions =
-      getPConnect().getValue((window as any).PCore.getConstants().CASE_INFO.AVAILABLEACTIONS) || [];
-    // const targetAction = availableActions.find((action: { ID: string }) => action.ID === localAction);
-    return (
-      <DashboardWrapper>
-        { parse(htmlData || '<p>No DisplayHTML content available</p>') }
-      </DashboardWrapper>
-    );
-  }
-  return null;
+    const handler = (e: Event) => {
+      const target = e.target as HTMLElement;
+
+      if (target.matches('.explain-btn')) {
+        const id = target.getAttribute('data-id');
+        if (!id) return;
+
+        const el = container.querySelector(`#${id}`);
+        if (el) {
+          el.setAttribute(
+            'style',
+            el.getAttribute('style') === 'display: block;' ? 'display: none;' : 'display: block;'
+          );
+        }
+      }
+    };
+
+    container.addEventListener('click', handler);
+
+    return () => container.removeEventListener('click', handler);
+  }, []);
+
+
+  if (!value || !localAction) return null;
+
+
+  return (
+    <DashboardWrapper>
+      <div ref={containerRef}>
+        {htmlData
+          ? parse(
+            htmlData
+              .replace(
+                /onclick='toggleExplanation\('(.*?)'\)'/g,
+                'class=\'explain-btn\' data-id=\'$1\''
+              )
+              .replace(
+                /onclick="toggleExplanation\('(.*?)'\)"/g,
+                'class=\'explain-btn\' data-id=\'$1\''
+              )
+            )
+          : null}
+      </div>
+    </DashboardWrapper>
+  );
 };
 
 export default withConfiguration(PegaExtensionsFieldAsElement);

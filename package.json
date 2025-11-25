@@ -21,6 +21,8 @@
     "createLib": "custom-dx-components createLibrary",
     "createLibVersion": "custom-dx-components createVersion",
     "deleteLib": "custom-dx-components deleteLibrary",
+    "create": "custom-dx-components create",
+    "createAll": "custom-dx-components createAll",
     "deleteLibVersion": "custom-dx-components deleteVersion",
     "deletePublishedLib": "custom-dx-components deletePublished",
     "exportLibVersion": "custom-dx-components exportArchive",

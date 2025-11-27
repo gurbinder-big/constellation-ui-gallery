@@ -6,7 +6,8 @@ const sampleEvents = [
     id: 1,
     createdAt: new Date('2025-01-10T10:15:00Z').getTime(),
     header: 'Order Created',
-    message: 'Order #12345 created',
+    message:
+      'There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which dont look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isnt anything embarrassing hidden in the middle of text.',
     caseID: 'CASE-001',
     color: '#4285F4',
     icon: '📝',
@@ -96,7 +97,7 @@ const TimelineWidget: React.FC = () => {
   const lastDate = Math.max(...sampleEvents.map((e) => e.createdAt));
 
   const allDates: string[] = [];
-  let currentDate = new Date(firstDate);
+  const currentDate = new Date(firstDate);
   currentDate.setUTCHours(0, 0, 0, 0);
 
   const endDate = new Date(lastDate);
@@ -115,17 +116,18 @@ const TimelineWidget: React.FC = () => {
   });
 
   return (
-    <div className="timeline-widget">
-      <div className="timeline-header"><h2>Vertical Timeline</h2></div>
+    <div className='timeline-widget'>
+      <div className='timeline-header'>
+        <h2>Vertical Timeline</h2>
+      </div>
 
-      <div className="timeline-content">
-        <div className="timeline-vertical-line"></div>
+      <div className='timeline-content'>
+        <div className='timeline-vertical-line'></div>
 
-        <div className="timeline-events">
+        <div className='timeline-events'>
           {allDates.map((date) => (
-            <div key={date} className="timeline-date-group">
-
-              <div className="timeline-date-label">
+            <div key={date} className='timeline-date-group'>
+              <div className='timeline-date-label'>
                 {new Date(date).toLocaleDateString('en-US', {
                   day: 'numeric',
                   month: 'long',
@@ -134,51 +136,49 @@ const TimelineWidget: React.FC = () => {
               </div>
 
               {eventsByDate[date].length === 0 ? (
-                <div className="timeline-no-event">No events</div>
+                <div className='timeline-no-event'>No events</div>
               ) : (
                 eventsByDate[date].map((ev) => {
-
                   // AUTO DETECT FIELDS
                   const dynamicFields = Object.entries(ev).filter(
-                    ([key]) =>
-                      !['id', 'color', 'icon', 'image', 'createdAt'].includes(key)
+                    ([key]) => !['id', 'color', 'icon', 'image', 'createdAt'].includes(key),
                   );
 
                   return (
-                    <div key={ev.id} className="timeline-event">
-
-                      <div className="timeline-dot" style={{ backgroundColor: ev.color }}>
+                    <div key={ev.id} className='timeline-event'>
+                      <div className='timeline-dot' style={{ backgroundColor: ev.color }}>
                         {/*ev.image && <img src={ev.image} alt="" className="timeline-dot-img" /> */}
                         {/*ev.icon && <span className="timeline-dot-icon">{ev.icon}</span> */}
                       </div>
 
-                      <div className="timeline-card" style={{ borderColor: ev.color }}>
-
-                        <div className="timeline-card-title" style={{ color: ev.color }}>
-                          {ev.header || "Untitled Event"}
+                      <div className='timeline-card' style={{ borderColor: ev.color }}>
+                        <div className='timeline-card-title' style={{ color: ev.color }}>
+                          {ev.header || 'Untitled Event'}
                         </div>
 
-                        <div className="timeline-card-timestamp">
-                          <strong>Created At : </strong> {new Date(ev.createdAt).toLocaleString()}
-                        </div>
+                        <div className='timeline-card-column'>
+                          <div className='timeline-card-timestamp'>
+                            <strong>Created At : </strong> {new Date(ev.createdAt).toLocaleString()}
+                          </div>
 
-                        {dynamicFields.map(([key, value]) => {
-                          if (key === "header") return null; // skip header
+                          {dynamicFields.map(([key, value]) => {
+                            if (key === 'header') return null; // skip header
 
-                          if (key === "message") {
+                            if (key === 'message') {
+                              return (
+                                <div key={key} className='timeline-card-details timeline-card-details-message'>
+                                  {String(value)}
+                                </div>
+                              );
+                            }
+
                             return (
-                              <div key={key} className="timeline-card-details">
-                                {String(value)}
+                              <div key={key} className='timeline-card-details'>
+                                <strong>{key}: </strong> {String(value)}
                               </div>
                             );
-                          }
-
-                          return (
-                            <div key={key} className="timeline-card-details">
-                              <strong>{key}: </strong> {String(value)}
-                            </div>
-                          );
-                        })}
+                          })}
+                        </div>
                       </div>
                     </div>
                   );

@@ -162,12 +162,27 @@
 
 .timeline-dot {
   position: absolute;
-  left: -46px;
+  left: -59px;
   top: 0px;
-  width: 14px;
-  height: 14px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: 2px solid white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.timeline-dot-img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.timeline-dot-icon {
+  font-size: 16px;
+  color: white;
+  font-weight: bold;
+  line-height: 1;
 }
 
 .timeline-card {

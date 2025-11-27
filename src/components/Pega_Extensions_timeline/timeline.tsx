@@ -140,6 +140,8 @@ interface TimelineEvent {
   title: string;
   color: string;
   details: string;
+  icon?: string; // emoji or icon text
+  image?: string;
 }
 
 // ------------------------------
@@ -152,6 +154,7 @@ const sampleEvents: TimelineEvent[] = [
     title: 'Order Created',
     color: '#4285F4',
     details: 'Order #12345 created',
+    icon: '📝',
   },
   {
     id: 2,
@@ -159,6 +162,7 @@ const sampleEvents: TimelineEvent[] = [
     title: 'Payment Completed',
     color: '#0F9D58',
     details: 'Payment of ₹1500 completed',
+    image: 'https://cdn-icons-png.flaticon.com/512/992/992651.png',
   },
   {
     id: 3,
@@ -166,6 +170,7 @@ const sampleEvents: TimelineEvent[] = [
     title: 'Item Packed',
     color: '#F4B400',
     details: 'Package is packed at warehouse',
+    icon: '📦',
   },
   {
     id: 4,
@@ -173,6 +178,7 @@ const sampleEvents: TimelineEvent[] = [
     title: 'Shipped',
     color: '#DB4437',
     details: 'Shipment left the warehouse',
+    icon: '🚚',
   },
   {
     id: 5,
@@ -180,6 +186,7 @@ const sampleEvents: TimelineEvent[] = [
     title: 'Out for Delivery',
     color: '#A333C8',
     details: 'Courier is out for delivery',
+    icon: '📮',
   },
   {
     id: 6,
@@ -187,6 +194,7 @@ const sampleEvents: TimelineEvent[] = [
     title: 'Delivered',
     color: '#34A853',
     details: 'Package delivered successfully',
+    image: 'https://cdn-icons-png.flaticon.com/512/190/190411.png',
   },
   {
     id: 7,
@@ -194,6 +202,7 @@ const sampleEvents: TimelineEvent[] = [
     title: 'Return Requested',
     color: '#EA4335',
     details: 'Customer requested a return',
+    icon: '↩️',
   },
   {
     id: 8,
@@ -201,6 +210,7 @@ const sampleEvents: TimelineEvent[] = [
     title: 'Return Approved',
     color: '#0F9D58',
     details: 'Return approved',
+    icon: '✔️',
   },
 ];
 
@@ -263,7 +273,10 @@ const TimelineWidget: React.FC = () => {
               ) : (
                 eventsByDate[date].map((ev) => (
                   <div key={ev.id} className='timeline-event'>
-                    <div className='timeline-dot' style={{ backgroundColor: ev.color }}></div>
+                    <div className='timeline-dot' style={{ backgroundColor: ev.color }}>
+                      {ev.image && <img src={ev.image} alt='' className='timeline-dot-img' />}
+                      {ev.icon && <span className='timeline-dot-icon'>{ev.icon}</span>}
+                    </div>
                     <div className='timeline-card' style={{ borderColor: ev.color }}>
                       <div className='timeline-card-title' style={{ color: ev.color }}>
                         {ev.title}

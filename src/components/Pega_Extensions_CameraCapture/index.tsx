@@ -27,6 +27,16 @@ function PegaExtensionsCameraCapture(props: PConnFieldProps) {
   }, [getPConnect]);
 
   useEffect(() => {
+    const now = new Date();
+    const formatted = now
+      .toISOString()
+      .replace(/[:.]/g, '-')
+      .replace('T', '_')
+      .replace('Z', '');
+      setAttachmentFieldName(`image_${formatted}`);
+  },[]);
+
+  useEffect(() => {
     return () => {
       if (stream) {
         stream.getTracks().forEach((t) => t.stop());
@@ -77,6 +87,7 @@ function PegaExtensionsCameraCapture(props: PConnFieldProps) {
       stream.getTracks().forEach((t) => t.stop());
     }
     setStream(null);
+    setCapturedImg(null);
     setCameraActive(false);
   }, [stream]);
 
@@ -233,8 +244,9 @@ function PegaExtensionsCameraCapture(props: PConnFieldProps) {
                 <div className='captured-wrapper'>
                   <img className='captured-image' src={capturedImg} alt="Captured" />
                 </div>
-                <Flex container={{ gap: 2 }}>
+                <Flex>
                   <Input
+                    value={attachmentFieldName}
                     type='text'
                     placeholder='Enter File Name (Optional)'
                     style={{ width: "200px" }}
@@ -242,6 +254,7 @@ function PegaExtensionsCameraCapture(props: PConnFieldProps) {
                       setAttachmentFieldName(e.currentTarget.value);
                     }}
                   />
+                  <div className="inputAddon">.png</div>
                   <Button variant="primary" onClick={handleUpload} className='camera-buttons'>
                     Save as Attachment
                   </Button>

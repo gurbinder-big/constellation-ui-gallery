@@ -4,6 +4,10 @@ export default styled.div(() => {
   return css`
     margin: 0px 0;
 
+    input {
+      border-color: #e4e4e4;
+    }
+
     .camera-container {
       width: 100%;
       height: 420px;
@@ -24,11 +28,11 @@ export default styled.div(() => {
     }
 
     .captured-wrapper {
-      width: '80%',
-      height: 'auto',
-      borderRadius: 8,
-      overflow: 'hidden',
-      background: '#000'
+      width: 80%;
+      height: auto;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #000;
     }
 
     .captured-image {
@@ -41,6 +45,16 @@ export default styled.div(() => {
     .camera-buttons {
       color: #fff;
       width: fit-content;
+    }
+
+    .inputAddon {
+      display: inline-flex;
+      padding: 7px 12px;
+      margin-right: 5px;
+      background: #f0f0f0;
+      border: 1px solid #e4e4e4;
+      border-left: 0;
+      border-radius: 0 6px 6px 0;
     }
   `;
 });

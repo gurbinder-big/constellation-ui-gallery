@@ -10,7 +10,7 @@ const sampleEvents = [
       'There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which dont look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isnt anything embarrassing hidden in the middle of text.',
     caseID: 'CASE-001',
     color: '#4285F4',
-    icon: '📝',
+    type: 'order_created',
   },
   {
     id: 2,
@@ -20,6 +20,7 @@ const sampleEvents = [
     goalDate: '2025-01-12',
     color: '#0F9D58',
     image: 'https://cdn-icons-png.flaticon.com/512/992/992651.png',
+    type: 'payment_completed',
   },
   {
     id: 3,
@@ -28,7 +29,7 @@ const sampleEvents = [
     deadLineDate: '2025-01-13',
     caseID: 'CASE-001',
     color: '#F4B400',
-    icon: '📦',
+    type: 'warehouse_packed',
   },
   {
     id: 4,
@@ -37,7 +38,7 @@ const sampleEvents = [
     message: 'Shipment left the warehouse',
     createdBy: 'warehouse-team',
     color: '#DB4437',
-    icon: '🚚',
+    type: 'shipped',
   },
   {
     id: 6,
@@ -48,6 +49,7 @@ const sampleEvents = [
     deadLineDate: '2025-01-16',
     color: '#34A853',
     image: 'https://cdn-icons-png.flaticon.com/512/190/190411.png',
+    type: 'delivered',
   },
   {
     id: 5,
@@ -57,7 +59,7 @@ const sampleEvents = [
     caseID: 'CASE-001',
     goalDate: '2025-01-15',
     color: '#A333C8',
-    icon: '📮',
+    type: 'out_for_delivery',
   },
   {
     id: 6,
@@ -68,6 +70,7 @@ const sampleEvents = [
     deadLineDate: '2025-01-16',
     color: '#34A853',
     image: 'https://cdn-icons-png.flaticon.com/512/190/190411.png',
+    type: 'delivered',
   },
   {
     id: 7,
@@ -77,7 +80,7 @@ const sampleEvents = [
     createdBy: 'customer',
     caseID: 'CASE-RET-91',
     color: '#EA4335',
-    icon: '↩️',
+    type: 'return_requested',
   },
   {
     id: 8,
@@ -86,9 +89,11 @@ const sampleEvents = [
     goalDate: '2025-01-18',
     deadLineDate: '2025-01-20',
     color: '#0F9D58',
-    icon: '✔️',
-  },
+    type: 'return_approved',
+  }
 ];
+
+
 
 const formatDate = (ts: number) => new Date(ts).toISOString().split('T')[0];
 
@@ -114,6 +119,20 @@ const TimelineWidget: React.FC = () => {
     const d = formatDate(ev.createdAt);
     eventsByDate[d]?.push(ev);
   });
+
+  const icons: Record<string, string> = {
+    order_created: '📝',
+    payment_completed: '💰',
+    warehouse_packed: '📦',
+    shipped: '🚚',
+    delivered: '📬',
+    out_for_delivery: '📮',
+    return_requested: '↩️',
+    return_approved: '✔️',
+    slaDeadline: '⏰',
+    unknown: '❓',
+  };
+
 
   return (
     <div className='timeline-widget'>
@@ -144,9 +163,12 @@ const TimelineWidget: React.FC = () => {
                     ([key]) => !['id', 'color', 'icon', 'image', 'createdAt'].includes(key),
                   );
 
+                  const icon = icons[ev.type] || icons['unknown'];
+
                   return (
                     <div key={ev.id} className='timeline-event'>
                       <div className='timeline-dot' style={{ backgroundColor: ev.color }}>
+                        <span className="timeline-dot-icon">{icon}</span>
                         {/*ev.image && <img src={ev.image} alt="" className="timeline-dot-img" /> */}
                         {/*ev.icon && <span className="timeline-dot-icon">{ev.icon}</span> */}
                       </div>

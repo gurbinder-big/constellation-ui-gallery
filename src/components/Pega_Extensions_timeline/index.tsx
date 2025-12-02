@@ -3,7 +3,7 @@ import { withConfiguration } from '@pega/cosmos-react-core';
 
 // import type { PConnFieldProps } from '../shared/PConnProps';
 
-// import StyledPegaExtensionsTimelineWrapper from './styles';
+import StyledPegaExtensionsTimelineWrapper from './styles';
 import TimelineWidget from './timeline';
 
 // interface for props
@@ -29,7 +29,9 @@ import TimelineWidget from './timeline';
 function PegaExtensionsTimeline() {
   return (
     <>
-      <TimelineWidget />
+      <StyledPegaExtensionsTimelineWrapper>
+        <TimelineWidget />
+      </StyledPegaExtensionsTimelineWrapper>
     </>
   );
 }

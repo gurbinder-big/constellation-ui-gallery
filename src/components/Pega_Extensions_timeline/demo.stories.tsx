@@ -1,13 +1,12 @@
-import type { StoryObj } from '@storybook/react-webpack5';
-
+import type { Meta, StoryObj } from '@storybook/react-webpack5';
 import PegaExtensionsTimeline from './index';
 
-import { configProps, operatorDetails } from './mock';
+import { configProps, operatorDetails, timelineData } from './mock';
 
 const meta: Meta<typeof PegaExtensionsTimeline> = {
   title: 'PegaExtensionsTimeline',
   component: PegaExtensionsTimeline,
-  excludeStories: /.*Data$/
+  excludeStories: /.*Data$/,
 };
 
 export default meta;
@@ -17,59 +16,38 @@ if (!window.PCore) {
   window.PCore = {} as any;
 }
 
-window.PCore.getLocaleUtils = () => {
-  return {
-    getLocaleValue: (value: any) => {
-      return value;
-    }
-  } as any;
-};
+window.PCore.getLocaleUtils = () => ({
+  getLocaleValue: (value: any) => value,
+});
 
-window.PCore.getUserApi = () => {
-  return {
-    getOperatorDetails: () => {
-      return new Promise(resolve => {
-        // @ts-ignore
-        resolve(operatorDetails);
-      });
-    }
-  } as any;
-};
+window.PCore.getUserApi = () => ({
+  getOperatorDetails: () => Promise.resolve(operatorDetails),
+});
 
 export const BasePegaExtensionsTimeline: Story = (args: any) => {
-
   const props = {
-    label: configProps.label,
-    createOperator: configProps.createOperator,
-    updateOperator: configProps.updateOperator,
-    createDateTime: configProps.createDateTime,
-    updateDateTime: configProps.updateDateTime,
+    ...configProps,
 
-    getPConnect: () => {
-      return {
-        getActionsApi: () => {
-          return {
-            updateFieldValue: () => {/* nothing */},
-            triggerFieldChange: () => {/* nothing */}
-          };
-        },
-        ignoreSuggestion: () => {/* nothing */},
-        acceptSuggestion: () => {/* nothing */},
-        setInheritedProps: () => {/* nothing */},
-        resolveConfigProps: () => {/* nothing */}
-      };
-    }
-};
+    // Inject timeline events directly
+    data: timelineData,
 
-return (
-    <>
-      <PegaExtensionsTimeline {...props} {...args} />
-    </>
-  );
+    getPConnect: () => ({
+      getActionsApi: () => ({
+        updateFieldValue: () => {},
+        triggerFieldChange: () => {},
+      }),
+      ignoreSuggestion: () => {},
+      acceptSuggestion: () => {},
+      setInheritedProps: () => {},
+      resolveConfigProps: () => {},
+    }),
+  };
+
+  return <PegaExtensionsTimeline {...props} {...args} />;
 };
 
 BasePegaExtensionsTimeline.args = {
   createLabel: configProps.createLabel,
   updateLabel: configProps.updateLabel,
-  hideLabel: configProps.hideLabel
+  hideLabel: configProps.hideLabel,
 };

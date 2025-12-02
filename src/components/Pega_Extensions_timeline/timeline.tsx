@@ -1,110 +1,73 @@
-import React from 'react';
-//import './Timeline.css';
+import React, { useEffect, useState } from 'react';
 
-const sampleEvents = [
-  {
-    id: 1,
-    createdAt: new Date('2025-01-10T10:15:00Z').getTime(),
-    header: 'Order Created',
-    message:
-      'There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which dont look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isnt anything embarrassing hidden in the middle of text.',
-    caseID: 'CASE-001',
-    color: '#4285F4',
-    type: 'order_created',
-  },
-  {
-    id: 2,
-    createdAt: new Date('2025-01-10T12:45:00Z').getTime(),
-    details: 'Payment of ₹1500 completed',
-    createdBy: 'system',
-    goalDate: '2025-01-12',
-    color: '#0F9D58',
-    image: 'https://cdn-icons-png.flaticon.com/512/992/992651.png',
-    type: 'payment_completed',
-  },
-  {
-    id: 3,
-    createdAt: new Date('2025-01-11T09:30:00Z').getTime(),
-    details: 'Package is packed at warehouse',
-    deadLineDate: '2025-01-13',
-    caseID: 'CASE-001',
-    color: '#F4B400',
-    type: 'warehouse_packed',
-  },
-  {
-    id: 4,
-    createdAt: new Date('2025-01-12T08:45:00Z').getTime(),
-    header: 'Shipped',
-    message: 'Shipment left the warehouse',
-    createdBy: 'warehouse-team',
-    color: '#DB4437',
-    type: 'shipped',
-  },
-  {
-    id: 6,
-    createdAt: new Date('2025-01-13T15:30:00Z').getTime(),
-    header: 'Delivered',
-    details: 'Package delivered successfully',
-    createdBy: 'delivery-agent',
-    deadLineDate: '2025-01-16',
-    color: '#34A853',
-    image: 'https://cdn-icons-png.flaticon.com/512/190/190411.png',
-    type: 'delivered',
-  },
-  {
-    id: 5,
-    createdAt: new Date('2025-01-14T12:00:00Z').getTime(),
-    header: 'Out for Delivery',
-    details: 'Courier is out for delivery',
-    caseID: 'CASE-001',
-    goalDate: '2025-01-15',
-    color: '#A333C8',
-    type: 'out_for_delivery',
-  },
-  {
-    id: 6,
-    createdAt: new Date('2025-01-15T15:30:00Z').getTime(),
-    header: 'Delivered',
-    details: 'Package delivered successfully',
-    createdBy: 'delivery-agent',
-    deadLineDate: '2025-01-16',
-    color: '#34A853',
-    image: 'https://cdn-icons-png.flaticon.com/512/190/190411.png',
-    type: 'delivered',
-  },
-  {
-    id: 7,
-    createdAt: new Date('2025-01-17T10:00:00Z').getTime(),
-    header: 'Return Requested',
-    details: 'Customer requested a return',
-    createdBy: 'customer',
-    caseID: 'CASE-RET-91',
-    color: '#EA4335',
-    type: 'return_requested',
-  },
-  {
-    id: 8,
-    createdAt: new Date('2025-01-17T14:00:00Z').getTime(),
-    details: 'Return approved',
-    goalDate: '2025-01-18',
-    deadLineDate: '2025-01-20',
-    color: '#0F9D58',
-    type: 'return_approved',
-  }
-];
+const icons: Record<string, string> = {
+  order_created: '📝',
+  payment_completed: '💰',
+  warehouse_packed: '📦',
+  shipped: '🚚',
+  delivered: '📬',
+  out_for_delivery: '📮',
+  return_requested: '↩️',
+  return_approved: '✔️',
+  slaDeadline: '⏰',
+  unknown: '❓',
+};
 
-
+interface TimelineWidgetProps {
+  getPConnect?: () => any;
+  datapageName?: string;
+}
 
 const formatDate = (ts: number) => new Date(ts).toISOString().split('T')[0];
 
-const TimelineWidget: React.FC = () => {
-  const firstDate = Math.min(...sampleEvents.map((e) => e.createdAt));
-  const lastDate = Math.max(...sampleEvents.map((e) => e.createdAt));
+const TimelineWidget: React.FC<TimelineWidgetProps> = ({ getPConnect, datapageName }) => {
+  const [events, setEvents] = useState<any[]>([]);
+  const [normalized, setNormalized] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!getPConnect || !datapageName) return;
+
+    const pConn = getPConnect();
+    let dataList: any[] = [];
+
+    try {
+      const value = pConn.getValue ? pConn.getValue(datapageName) : null;
+      if (value && Array.isArray(value)) {
+        dataList = value;
+      }
+    } catch (error) {
+      console.warn('Failed to fetch Data Page:', error);
+      dataList = [];
+    }
+
+    setEvents(Array.isArray(dataList) ? dataList : []);
+  }, [getPConnect, datapageName]);
+
+  // Normalize events safely after fetching
+  useEffect(() => {
+    if (!events || events.length === 0) return;
+
+    const now = Date.now(); // ✅ impure function called only once per useEffect
+    const normalizedData = events.map((e, idx) => ({
+      id: e.id || idx + 1,
+      createdAt: new Date(e.createdAt || e.pxCreateDateTime || now).getTime(),
+      header: e.header || e.Label || e.Title || 'Event',
+      color: e.color || '#4285F4',
+      type: e.type || 'unknown',
+      ...e,
+    }));
+
+    setNormalized(normalizedData);
+  }, [events]);
+
+  if (!normalized || normalized.length === 0) return <div>No timeline events found</div>;
+
+  const firstDate = Math.min(...normalized.map((e) => e.createdAt));
+  const lastDate = Math.max(...normalized.map((e) => e.createdAt));
 
   const allDates: string[] = [];
   const currentDate = new Date(firstDate);
   currentDate.setUTCHours(0, 0, 0, 0);
-
   const endDate = new Date(lastDate);
   endDate.setUTCHours(0, 0, 0, 0);
 
@@ -115,24 +78,11 @@ const TimelineWidget: React.FC = () => {
 
   const eventsByDate: Record<string, any[]> = {};
   allDates.forEach((d) => (eventsByDate[d] = []));
-  sampleEvents.forEach((ev) => {
+  normalized.forEach((ev) => {
     const d = formatDate(ev.createdAt);
-    eventsByDate[d]?.push(ev);
+    if (!eventsByDate[d]) eventsByDate[d] = [];
+    eventsByDate[d].push(ev);
   });
-
-  const icons: Record<string, string> = {
-    order_created: '📝',
-    payment_completed: '💰',
-    warehouse_packed: '📦',
-    shipped: '🚚',
-    delivered: '📬',
-    out_for_delivery: '📮',
-    return_requested: '↩️',
-    return_approved: '✔️',
-    slaDeadline: '⏰',
-    unknown: '❓',
-  };
-
 
   return (
     <div className='timeline-widget'>
@@ -154,13 +104,12 @@ const TimelineWidget: React.FC = () => {
                 })}
               </div>
 
-              {eventsByDate[date].length === 0 ? (
+              {!eventsByDate[date] || eventsByDate[date].length === 0 ? (
                 <div className='timeline-no-event'>No events</div>
               ) : (
                 eventsByDate[date].map((ev) => {
-                  // AUTO DETECT FIELDS
                   const dynamicFields = Object.entries(ev).filter(
-                    ([key]) => !['id', 'color', 'icon', 'image', 'createdAt'].includes(key),
+                    ([k]) => !['id', 'color', 'icon', 'image', 'createdAt', 'pxCreateDateTime'].includes(k),
                   );
 
                   const icon = icons[ev.type] || icons['unknown'];
@@ -168,38 +117,24 @@ const TimelineWidget: React.FC = () => {
                   return (
                     <div key={ev.id} className='timeline-event'>
                       <div className='timeline-dot' style={{ backgroundColor: ev.color }}>
-                        <span className="timeline-dot-icon">{icon}</span>
-                        {/*ev.image && <img src={ev.image} alt="" className="timeline-dot-img" /> */}
-                        {/*ev.icon && <span className="timeline-dot-icon">{ev.icon}</span> */}
+                        <span className='timeline-dot-icon'>{icon}</span>
                       </div>
 
                       <div className='timeline-card' style={{ borderColor: ev.color }}>
                         <div className='timeline-card-title' style={{ color: ev.color }}>
-                          {ev.header || 'Untitled Event'}
+                          {ev.header}
                         </div>
 
                         <div className='timeline-card-column'>
                           <div className='timeline-card-timestamp'>
-                            <strong>Created At : </strong> {new Date(ev.createdAt).toLocaleString()}
+                            <strong>Created At: </strong> {new Date(ev.createdAt).toLocaleString()}
                           </div>
 
-                          {dynamicFields.map(([key, value]) => {
-                            if (key === 'header') return null; // skip header
-
-                            if (key === 'message') {
-                              return (
-                                <div key={key} className='timeline-card-details timeline-card-details-message'>
-                                  {String(value)}
-                                </div>
-                              );
-                            }
-
-                            return (
-                              <div key={key} className='timeline-card-details'>
-                                <strong>{key}: </strong> {String(value)}
-                              </div>
-                            );
-                          })}
+                          {dynamicFields.map(([key, value]) => (
+                            <div key={key} className='timeline-card-details'>
+                              <strong>{key}: </strong> {String(value)}
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </div>

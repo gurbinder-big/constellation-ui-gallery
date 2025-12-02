@@ -1,66 +1,24 @@
 {
-  "name": "Pega_Extensions_timeline",
+  "name": "Pega_Extensions_Timeline",
   "label": "Timeline",
-  "description": "Timeline",
+  "description": "Timeline Widget to display events from Pega Data Pages",
   "organization": "Pega",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "library": "Extensions",
-  "componentKey": "Pega_Extensions_timeline",
+  "componentKey": "Pega_Extensions_Timeline",
   "type": "Widget",
-  "subtype": ["PAGE","CASE"],
+  "subtype": ["PAGE", "CASE"],
   "subtypeLabel": "PAGE and CASE",
   "icon": "OneColumnPage.svg",
-   "properties": [
+  "properties": [
     {
-      "name": "title",
-      "label": "Label value",
-      "format": "TEXT"
-    },
-    {
-      "format": "SELECT",
-      "label": "Usage",
-      "name": "label",
-      "defaultValue": "Create operator",
-      "localize": true,
-      "source": [
-        {
-          "key": "Create operator",
-          "value": "Create operator"
-        },
-        {
-          "key": "Update operator",
-          "value": "Update operator"
-        },
-        {
-          "key": "Resolve operator",
-          "value": "Resolve operator"
-        }
-      ]
-    },
-
-    {
-      "label": "Conditions",
-      "format": "GROUP",
-      "properties": [
-        {
-          "name": "visibility",
-          "label": "Visibility",
-          "format": "VISIBILITY"
-        }
-      ]
+      "name": "dataPage",
+      "label": "Data Page name",
+      "format": "TEXT",
+      "required": true
     }
   ],
   "defaultConfig": {
-    "label": "Create operator",
-    "title": "Create operator",
-    "createLabel": "@L Created",
-    "updateLabel": "@L Updated",
-    "createOperator": "@USER .pxCreateOperator",
-    "updateOperator": "@USER .pxUpdateOperator",
-    "createDateTime": "@P .pxCreateDateTime",
-    "updateDateTime": "@P .pxUpdateDateTime",
-    "resolveLabel": "@L Resolved",
-    "resolveOperator": "@USER .pyResolvedUserID",
-    "resolveDateTime": "@P .pyResolvedTimestamp"
+    "datapageName": ""
   }
 }

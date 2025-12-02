@@ -1,45 +1,65 @@
-// import { Fragment } from 'react';
-import { withConfiguration } from '@pega/cosmos-react-core';
+// import React, { useEffect, useState } from 'react';
+// import { withConfiguration } from '@pega/cosmos-react-core';
 
-// import type { PConnFieldProps } from '../shared/PConnProps';
+// import StyledPegaExtensionsTimelineWrapper from './styles';
+// import TimelineWidget from './timeline';
 
-import StyledPegaExtensionsTimelineWrapper from './styles';
-import TimelineWidget from './timeline';
-
-// interface for props
-// interface PegaExtensionsTimelineProps extends PConnFieldProps {
-//   // If any, enter additional props that only exist on TextInput here
+// interface PegaExtensionsTimelineProps {
+//   datapageName: string;
 //   title: string;
-//   createLabel: string;
-//   updateLabel: string;
-//   resolveLabel: string;
-//   createOperator: any;
-//   updateOperator: any;
-//   resolveOperator: any;
-//   createDateTime: string;
-//   updateDateTime: string;
-//   resolveDateTime: string;
-//   hideLabel: boolean;
 // }
 
-// Duplicated runtime code from Constellation Design System Component
+// function PegaExtensionsTimeline(props: PegaExtensionsTimelineProps) {
+//   const { datapageName } = props;
 
-// props passed in combination of props from property panel (config.json) and run time props from Constellation
-// any default values in config.pros should be set in defaultProps at bottom of this file
-function PegaExtensionsTimeline() {
-  return (
-    <>
-      <StyledPegaExtensionsTimelineWrapper>
-        <TimelineWidget />
-      </StyledPegaExtensionsTimelineWrapper>
-    </>
-  );
+//   const [records, setRecords] = useState<any[]>([]);
+//   const [loading, setLoading] = useState(true);
+
+//   useEffect(() => {
+//     if (!datapageName) return;
+
+//     const fetchData = async () => {
+//       try {
+//         // Pega DX API pattern
+//         const resp = await fetch(`/api/v1/data/${datapageName}`);
+//         const json = await resp.json();
+
+//         const results = json?.pxResults || json?.data || json?.items || Array.isArray(json) ? json : [];
+
+//         setRecords(results);
+//       } catch (e) {
+//         console.error('DATAPAGE FETCH ERROR:', e);
+//         setRecords([]);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchData();
+//   }, [datapageName]);
+
+//   if (loading) return <div>Loading Timeline...</div>;
+
+//   return (
+//     <StyledPegaExtensionsTimelineWrapper>
+//       <TimelineWidget data={records} />
+//     </StyledPegaExtensionsTimelineWrapper>
+//   );
+// }
+
+// export default withConfiguration(PegaExtensionsTimeline);
+
+import React from 'react';
+import TimelineWidget from './timeline';
+
+interface PegaExtensionsTimelineProps {
+  getPConnect?: () => any;
+  datapageName?: string;
 }
 
-export default withConfiguration(PegaExtensionsTimeline);
+// Wrapper component to pass props from Pega
+const PegaExtensionsTimeline: React.FC<PegaExtensionsTimelineProps> = ({ getPConnect, datapageName }) => {
+  return <TimelineWidget getPConnect={getPConnect} datapageName={datapageName} />;
+};
 
-// as objects are there in props, shallow comparision fails & re-rendering of comp happens even with
-// same key value pairs in obj. hence using custom comparison function on when to re-render
-// const comparisonFn = (prevProps, nextProps) => {
-//   return prevProps.updateDateTime === nextProps.updateDateTime;
-// };
+export default PegaExtensionsTimeline;

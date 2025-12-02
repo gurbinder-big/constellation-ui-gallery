@@ -1,5 +1,5 @@
 import React from 'react';
-import './Timeline.css';
+//import './Timeline.css';
 
 const sampleEvents = [
   {

@@ -1,5 +1,4 @@
-/* eslint-disable react/jsx-no-useless-fragment */
-import type { Meta, StoryObj } from '@storybook/react';
+import type { StoryObj } from '@storybook/react-webpack5';
 
 import PegaExtensionsTimeline from './index';
 

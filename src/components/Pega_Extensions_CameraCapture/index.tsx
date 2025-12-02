@@ -122,7 +122,6 @@ function PegaExtensionsCameraCapture(props: PConnFieldProps) {
     canvasContext.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
     const capturedImageData = canvasElement.toDataURL('image/png');
     setCapturedImg(capturedImageData);
-    stopCamera();
   };
 
 

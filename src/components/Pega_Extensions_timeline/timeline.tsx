@@ -16,6 +16,8 @@ const icons: Record<string, string> = {
 interface TimelineWidgetProps {
   getPConnect?: () => any;
   datapageName?: string;
+  data?: any[];
+  isLoading?: boolean;
 }
 
 const formatDate = (ts: number) => new Date(ts).toISOString().split('T')[0];
@@ -23,31 +25,39 @@ const formatDate = (ts: number) => new Date(ts).toISOString().split('T')[0];
 const TimelineWidget: React.FC<TimelineWidgetProps> = ({ getPConnect, datapageName, data }) => {
   const [events, setEvents] = useState<any[]>([]);
   const [normalized, setNormalized] = useState<any[]>([]);
+  console.log(data, 'Data From Pega side');
 
+  // Use data passed from parent
   useEffect(() => {
+    if (data && Array.isArray(data)) {
+      setEvents(data); // ✅ FIX 2 — use the "data" prop → removes unused-var error
+      return;
+    }
+
+    // fallback: get data from PConnect
     if (!getPConnect || !datapageName) return;
 
-    const pConn = getPConnect();
-    let dataList: any[] = [];
-
     try {
-      const value = pConn.getValue ? pConn.getValue(datapageName) : null;
+      const pConn = getPConnect();
+      const value = pConn?.getValue?.(datapageName);
+
       if (value && Array.isArray(value)) {
-        dataList = value;
+        setEvents(value);
+      } else {
+        setEvents([]);
       }
     } catch (error) {
       console.warn('Failed to fetch Data Page:', error);
-      dataList = [];
+      setEvents([]);
     }
+  }, [data, getPConnect, datapageName]);
 
-    setEvents(Array.isArray(dataList) ? dataList : []);
-  }, [getPConnect, datapageName]);
-
-  // Normalize events safely after fetching
+  // Normalize events
   useEffect(() => {
     if (!events || events.length === 0) return;
 
-    const now = Date.now(); // ✅ impure function called only once per useEffect
+    const now = Date.now();
+
     const normalizedData = events.map((e, idx) => ({
       id: e.id || idx + 1,
       createdAt: new Date(e.createdAt || e.pxCreateDateTime || now).getTime(),
@@ -65,22 +75,22 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ getPConnect, datapageNa
   const firstDate = Math.min(...normalized.map((e) => e.createdAt));
   const lastDate = Math.max(...normalized.map((e) => e.createdAt));
 
-  const allDates: string[] = [];
+  // const allDates: string[] = [];
   const currentDate = new Date(firstDate);
   currentDate.setUTCHours(0, 0, 0, 0);
+
   const endDate = new Date(lastDate);
   endDate.setUTCHours(0, 0, 0, 0);
 
   while (currentDate <= endDate) {
-    allDates.push(formatDate(currentDate.getTime()));
+    data?.push(formatDate(currentDate.getTime()));
     currentDate.setUTCDate(currentDate.getUTCDate() + 1);
   }
 
   const eventsByDate: Record<string, any[]> = {};
-  allDates.forEach((d) => (eventsByDate[d] = []));
+  data?.forEach((d) => (eventsByDate[d] = []));
   normalized.forEach((ev) => {
     const d = formatDate(ev.createdAt);
-    if (!eventsByDate[d]) eventsByDate[d] = [];
     eventsByDate[d].push(ev);
   });
 
@@ -94,7 +104,7 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ getPConnect, datapageNa
         <div className='timeline-vertical-line'></div>
 
         <div className='timeline-events'>
-          {allDates.map((date) => (
+          {data?.map((date) => (
             <div key={date} className='timeline-date-group'>
               <div className='timeline-date-label'>
                 {new Date(date).toLocaleDateString('en-US', {

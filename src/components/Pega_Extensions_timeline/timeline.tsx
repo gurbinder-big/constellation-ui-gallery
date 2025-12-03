@@ -20,7 +20,7 @@ interface TimelineWidgetProps {
 
 const formatDate = (ts: number) => new Date(ts).toISOString().split('T')[0];
 
-const TimelineWidget: React.FC<TimelineWidgetProps> = ({ getPConnect, datapageName }) => {
+const TimelineWidget: React.FC<TimelineWidgetProps> = ({ getPConnect, datapageName, data }) => {
   const [events, setEvents] = useState<any[]>([]);
   const [normalized, setNormalized] = useState<any[]>([]);
 

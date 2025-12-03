@@ -1,38 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import TimelineWidget from './timeline';
+import StyledPegaExtensionsTimelineWrapper from './styles';
 
 interface PegaExtensionsTimelineProps {
   getPConnect?: () => any;
   dataPage?: string;
 }
 
-declare global {
-  interface Window {
-    PCore: any;
-  }
-}
-
 const PegaExtensionsTimeline: React.FC<PegaExtensionsTimelineProps> = ({ getPConnect, dataPage }) => {
-  // ✅ FIX 1 — prevent undefined call
   const PConnect = getPConnect?.() ?? null;
-
-  const context = PConnect?.getContextName?.() ?? '';
-
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    const context = PConnect?.getContextName?.() ?? '';
     const fetchData = async () => {
-      if (!dataPage || !context || !window.PCore) {
-        setData([]);
-        return;
-      }
-
       try {
         setLoading(true);
-
-        const response = await window.PCore.getDataApiUtils().getData(dataPage, {}, context);
-
+        const response = await PCore.getDataApiUtils().getData(dataPage, {}, context);
         const results = response?.data?.data ?? [];
         setData(results);
       } catch (e) {
@@ -44,16 +29,28 @@ const PegaExtensionsTimeline: React.FC<PegaExtensionsTimelineProps> = ({ getPCon
     };
 
     fetchData();
-  }, [dataPage, context]);
+  }, [dataPage]);
+
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!data.length) {
+    return <div>No Data</div>;
+  }
 
   return (
-    <TimelineWidget
-      getPConnect={getPConnect}
-      data={data}
-      datapageName={dataPage}
-      isLoading={loading} // ✅ FIX 2: now valid
-    />
+    <StyledPegaExtensionsTimelineWrapper>
+      <TimelineWidget
+        getPConnect={getPConnect}
+        data={data}
+        datapageName={dataPage}
+        isLoading={loading}
+      />
+    </StyledPegaExtensionsTimelineWrapper>
   );
+
 };
 
 export default PegaExtensionsTimeline;

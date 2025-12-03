@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from "react";
 
 const icons: Record<string, string> = {
-  order_created: '📝',
-  payment_completed: '💰',
-  warehouse_packed: '📦',
-  shipped: '🚚',
-  delivered: '📬',
-  out_for_delivery: '📮',
-  return_requested: '↩️',
-  return_approved: '✔️',
-  slaDeadline: '⏰',
-  unknown: '❓',
+  order_created: "📝",
+  payment_completed: "💰",
+  warehouse_packed: "📦",
+  shipped: "🚚",
+  delivered: "📬",
+  out_for_delivery: "📮",
+  return_requested: "↩️",
+  return_approved: "✔️",
+  slaDeadline: "⏰",
+  unknown: "❓",
 };
 
 interface TimelineWidgetProps {
@@ -20,128 +20,128 @@ interface TimelineWidgetProps {
   isLoading?: boolean;
 }
 
-const formatDate = (ts: number) => new Date(ts).toISOString().split('T')[0];
+const formatDate = (ts: number) => new Date(ts).toISOString().split("T")[0];
 
-const TimelineWidget: React.FC<TimelineWidgetProps> = ({ getPConnect, datapageName, data }) => {
-  const [events, setEvents] = useState<any[]>([]);
-  const [normalized, setNormalized] = useState<any[]>([]);
-  console.log(data, 'Data From Pega side');
+const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data }) => {
+  const [normalizedEvents, setNormalizedEvents] = useState<any[]>([]);
 
-  // Use data passed from parent
   useEffect(() => {
-    if (data && Array.isArray(data)) {
-      setEvents(data); // ✅ FIX 2 — use the "data" prop → removes unused-var error
-      return;
-    }
-
-    // fallback: get data from PConnect
-    if (!getPConnect || !datapageName) return;
-
-    try {
-      const pConn = getPConnect();
-      const value = pConn?.getValue?.(datapageName);
-
-      if (value && Array.isArray(value)) {
-        setEvents(value);
-      } else {
-        setEvents([]);
-      }
-    } catch (error) {
-      console.warn('Failed to fetch Data Page:', error);
-      setEvents([]);
-    }
-  }, [data, getPConnect, datapageName]);
-
-  // Normalize events
-  useEffect(() => {
-    if (!events || events.length === 0) return;
-
+    if (!data) return;
     const now = Date.now();
 
-    const normalizedData = events.map((e, idx) => ({
-      id: e.id || idx + 1,
-      createdAt: new Date(e.createdAt || e.pxCreateDateTime || now).getTime(),
-      header: e.header || e.Label || e.Title || 'Event',
-      color: e.color || '#4285F4',
-      type: e.type || 'unknown',
-      ...e,
-    }));
+    const normalized = data.map((e, idx) => {
+      const timestamp = new Date(e.createdAt).getTime();
+      return {
+        ...e,
+        id: e.id ?? idx + 1,
+        createdAt: timestamp,
+        header: e.header || e.Label || e.Title || "Event",
+        color: e.color || "#4285F4",
+        type: e.type || "unknown",
+      };
+    });
 
-    setNormalized(normalizedData);
-  }, [events]);
+    console.log(normalized);
+    setNormalizedEvents(normalized);
+  }, [data]);
 
-  if (!normalized || normalized.length === 0) return <div>No timeline events found</div>;
+  const allDates = useMemo(() => {
+    if (normalizedEvents.length === 0) return [];
 
-  const firstDate = Math.min(...normalized.map((e) => e.createdAt));
-  const lastDate = Math.max(...normalized.map((e) => e.createdAt));
+    const first = Math.min(...normalizedEvents.map((e) => e.createdAt));
+    const last = Math.max(...normalizedEvents.map((e) => e.createdAt));
 
-  // const allDates: string[] = [];
-  const currentDate = new Date(firstDate);
-  currentDate.setUTCHours(0, 0, 0, 0);
+    console.log(first);
+    console.log(last);
 
-  const endDate = new Date(lastDate);
-  endDate.setUTCHours(0, 0, 0, 0);
+    const dates: string[] = [];
 
-  while (currentDate <= endDate) {
-    data?.push(formatDate(currentDate.getTime()));
-    currentDate.setUTCDate(currentDate.getUTCDate() + 1);
-  }
+    const start = new Date(first);
+    start.setUTCHours(0, 0, 0, 0);
 
-  const eventsByDate: Record<string, any[]> = {};
-  data?.forEach((d) => (eventsByDate[d] = []));
-  normalized.forEach((ev) => {
-    const d = formatDate(ev.createdAt);
-    eventsByDate[d].push(ev);
-  });
+    const end = new Date(last);
+    end.setUTCHours(0, 0, 0, 0);
+
+    while (start <= end) {
+      dates.push(formatDate(start.getTime()));
+      start.setUTCDate(start.getUTCDate() + 1);
+    }
+
+    return dates;
+  }, [normalizedEvents]);
+
+  console.log(allDates);
+
+
+  const eventsByDate = useMemo(() => {
+    const map: Record<string, any[]> = {};
+
+    allDates.forEach((d) => (map[d] = []));
+
+    normalizedEvents.forEach((ev) => {
+      const d = formatDate(ev.createdAt);
+      if (!map[d]) map[d] = [];
+      map[d].push(ev);
+    });
+
+    return map;
+  }, [allDates, normalizedEvents]);
 
   return (
-    <div className='timeline-widget'>
-      <div className='timeline-header'>
+    <div className="timeline-widget">
+      <div className="timeline-header">
         <h2>Vertical Timeline</h2>
       </div>
 
-      <div className='timeline-content'>
-        <div className='timeline-vertical-line'></div>
+      <div className="timeline-content">
+        <div className="timeline-vertical-line"></div>
 
-        <div className='timeline-events'>
-          {data?.map((date) => (
-            <div key={date} className='timeline-date-group'>
-              <div className='timeline-date-label'>
-                {new Date(date).toLocaleDateString('en-US', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
+        <div className="timeline-events">
+
+          {
+            allDates.length == 0 && <p>dsadsaa </p>
+          }
+
+          {
+            allDates.map((date) => (
+            <div key={date} className="timeline-date-group">
+              <div className="timeline-date-label">
+                {new Date(date).toLocaleDateString("en-US", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
                 })}
               </div>
 
-              {!eventsByDate[date] || eventsByDate[date].length === 0 ? (
-                <div className='timeline-no-event'>No events</div>
+              {eventsByDate[date].length === 0 ? (
+                <div className="timeline-no-event">No events</div>
               ) : (
                 eventsByDate[date].map((ev) => {
                   const dynamicFields = Object.entries(ev).filter(
-                    ([k]) => !['id', 'color', 'icon', 'image', 'createdAt', 'pxCreateDateTime'].includes(k),
+                    ([k]) => !["id", "color", "icon", "image", "createdAt", "pxCreateDateTime"].includes(k)
                   );
 
-                  const icon = icons[ev.type] || icons['unknown'];
+                  const icon = icons[ev.type] || icons["unknown"];
 
                   return (
-                    <div key={ev.id} className='timeline-event'>
-                      <div className='timeline-dot' style={{ backgroundColor: ev.color }}>
-                        <span className='timeline-dot-icon'>{icon}</span>
+                    <div key={ev.id} className="timeline-event">
+                      <div className="timeline-dot" style={{ backgroundColor: ev.color }}>
+                        <span className="timeline-dot-icon">{icon}</span>
                       </div>
 
-                      <div className='timeline-card' style={{ borderColor: ev.color }}>
-                        <div className='timeline-card-title' style={{ color: ev.color }}>
+                      <div className="timeline-card" style={{ borderColor: ev.color }}>
+                        <div className="timeline-card-title" style={{ color: ev.color }}>
                           {ev.header}
                         </div>
 
-                        <div className='timeline-card-column'>
-                          <div className='timeline-card-timestamp'>
-                            <strong>Created At: </strong> {new Date(ev.createdAt).toLocaleString()}
+                        <div className="timeline-card-column">
+                          <div className="timeline-card-timestamp">
+                            <strong>Created At: </strong>
+                            {new Date(ev.createdAt).toLocaleString()}
                           </div>
 
                           {dynamicFields.map(([key, value]) => (
-                            <div key={key} className='timeline-card-details'>
+                            <div key={key} className="timeline-card-details">
                               <strong>{key}: </strong> {String(value)}
                             </div>
                           ))}

@@ -216,9 +216,6 @@ function PegaExtensionsCameraCapture(props: PConnFieldProps) {
                 <Button variant="primary" onClick={startCamera} className='camera-buttons'>
                   Capture with Camera
                 </Button>
-                <Button variant="primary" onClick={stopCamera} className='camera-buttons'>
-                  Turn off Camera
-                </Button>
               </Flex>
             )}
 
@@ -244,7 +241,7 @@ function PegaExtensionsCameraCapture(props: PConnFieldProps) {
                 <div className='captured-wrapper'>
                   <img className='captured-image' src={capturedImg} alt="Captured" />
                 </div>
-                <Flex>
+                <Flex container={{}}>
                   <Input
                     value={attachmentFieldName}
                     type='text'

@@ -94,7 +94,7 @@ window.PCore.getUserApi = () => ({
 });
 
 window.PCore.getDataApiUtils = () => ({
-  getData: (endpoint ,a ,b) => Promise.resolve(mockData),
+  getData: () => Promise.resolve(mockData),
 });
 
 export const BasePegaExtensionsTimeline: Story = (args: any) => {

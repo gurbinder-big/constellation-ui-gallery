@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import TimelineWidget from './timeline';
+import TimelineWidget from './Timeline';
 import StyledPegaExtensionsTimelineWrapper from './styles';
 
 interface PegaExtensionsTimelineProps {
@@ -17,7 +17,7 @@ const PegaExtensionsTimeline: React.FC<PegaExtensionsTimelineProps> = ({ getPCon
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await PCore.getDataApiUtils().getData(dataPage, {}, context);
+        const response = await (window as any).PCore.getDataApiUtils().getData(dataPage, {}, context);
         const results = response?.data?.data ?? [];
         setData(results);
       } catch (e) {

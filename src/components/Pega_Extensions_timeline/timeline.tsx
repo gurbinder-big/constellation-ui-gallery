@@ -27,10 +27,8 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data }) => {
 
   useEffect(() => {
     if (!data) return;
-    const now = Date.now();
-
     const normalized = data.map((e, idx) => {
-      const timestamp = new Date(e.createdAt).getTime();
+      const timestamp = new Date(e.createdAt || e.CreatedAt).getTime();
       return {
         ...e,
         id: e.id ?? idx + 1,

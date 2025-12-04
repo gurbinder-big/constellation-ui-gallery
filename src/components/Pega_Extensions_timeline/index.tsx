@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import TimelineWidget from './Timeline';
+import TimelineWidget from './timeline';
 import StyledPegaExtensionsTimelineWrapper from './styles';
 
 interface PegaExtensionsTimelineProps {
@@ -31,7 +31,6 @@ const PegaExtensionsTimeline: React.FC<PegaExtensionsTimelineProps> = ({ getPCon
     fetchData();
   }, [dataPage]);
 
-
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -42,15 +41,9 @@ const PegaExtensionsTimeline: React.FC<PegaExtensionsTimelineProps> = ({ getPCon
 
   return (
     <StyledPegaExtensionsTimelineWrapper>
-      <TimelineWidget
-        getPConnect={getPConnect}
-        data={data}
-        datapageName={dataPage}
-        isLoading={loading}
-      />
+      <TimelineWidget getPConnect={getPConnect} data={data} datapageName={dataPage} isLoading={loading} />
     </StyledPegaExtensionsTimelineWrapper>
   );
-
 };
 
 export default PegaExtensionsTimeline;

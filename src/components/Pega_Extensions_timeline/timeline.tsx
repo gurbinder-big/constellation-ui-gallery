@@ -1,16 +1,16 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from 'react';
 
 const icons: Record<string, string> = {
-  order_created: "📝",
-  payment_completed: "💰",
-  warehouse_packed: "📦",
-  shipped: "🚚",
-  delivered: "📬",
-  out_for_delivery: "📮",
-  return_requested: "↩️",
-  return_approved: "✔️",
-  slaDeadline: "⏰",
-  unknown: "❓",
+  order_created: '📝',
+  payment_completed: '💰',
+  warehouse_packed: '📦',
+  shipped: '🚚',
+  delivered: '📬',
+  out_for_delivery: '📮',
+  return_requested: '↩️',
+  return_approved: '✔️',
+  slaDeadline: '⏰',
+  unknown: '❓',
 };
 
 interface TimelineWidgetProps {
@@ -20,7 +20,7 @@ interface TimelineWidgetProps {
   isLoading?: boolean;
 }
 
-const formatDate = (ts: number) => new Date(ts).toISOString().split("T")[0];
+const formatDate = (ts: number) => new Date(ts).toISOString().split('T')[0];
 
 const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data }) => {
   const [normalizedEvents, setNormalizedEvents] = useState<any[]>([]);
@@ -33,9 +33,9 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data }) => {
         ...e,
         id: e.id ?? idx + 1,
         createdAt: timestamp,
-        header: e.header || e.Label || e.Title || "Event",
-        color: e.color || "#4285F4",
-        type: e.type || "unknown",
+        header: e.header || e.Label || e.Title || 'Event',
+        Color: e.Color || '#4285F4',
+        Type: e.Type || 'unknown',
       };
     });
 
@@ -70,7 +70,6 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data }) => {
 
   console.log(allDates);
 
-
   const eventsByDate = useMemo(() => {
     const map: Record<string, any[]> = {};
 
@@ -86,60 +85,56 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data }) => {
   }, [allDates, normalizedEvents]);
 
   return (
-    <div className="timeline-widget">
-      <div className="timeline-header">
+    <div className='timeline-widget'>
+      <div className='timeline-header'>
         <h2>Vertical Timeline</h2>
       </div>
 
-      <div className="timeline-content">
-        <div className="timeline-vertical-line"></div>
+      <div className='timeline-content'>
+        <div className='timeline-vertical-line'></div>
 
-        <div className="timeline-events">
+        <div className='timeline-events'>
+          {allDates.length == 0 && <p>dsadsaa </p>}
 
-          {
-            allDates.length == 0 && <p>dsadsaa </p>
-          }
-
-          {
-            allDates.map((date) => (
-            <div key={date} className="timeline-date-group">
-              <div className="timeline-date-label">
-                {new Date(date).toLocaleDateString("en-US", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
+          {allDates.map((date) => (
+            <div key={date} className='timeline-date-group'>
+              <div className='timeline-date-label'>
+                {new Date(date).toLocaleDateString('en-US', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
                 })}
               </div>
 
               {eventsByDate[date].length === 0 ? (
-                <div className="timeline-no-event">No events</div>
+                <div className='timeline-no-event'>No events</div>
               ) : (
                 eventsByDate[date].map((ev) => {
                   const dynamicFields = Object.entries(ev).filter(
-                    ([k]) => !["id", "color", "icon", "image", "createdAt", "pxCreateDateTime"].includes(k)
+                    ([k]) => !['id', 'Color', 'icon', 'image', 'createdAt', 'pxCreateDateTime'].includes(k),
                   );
 
-                  const icon = icons[ev.type] || icons["unknown"];
+                  const icon = icons[ev.Type] || icons['unknown'];
 
                   return (
-                    <div key={ev.id} className="timeline-event">
-                      <div className="timeline-dot" style={{ backgroundColor: ev.color }}>
-                        <span className="timeline-dot-icon">{icon}</span>
+                    <div key={ev.id} className='timeline-event'>
+                      <div className='timeline-dot' style={{ backgroundColor: ev.Color }}>
+                        <span className='timeline-dot-icon'>{icon}</span>
                       </div>
 
-                      <div className="timeline-card" style={{ borderColor: ev.color }}>
-                        <div className="timeline-card-title" style={{ color: ev.color }}>
+                      <div className='timeline-card' style={{ borderColor: ev.Color }}>
+                        <div className='timeline-card-title' style={{ color: ev.Color }}>
                           {ev.header}
                         </div>
 
-                        <div className="timeline-card-column">
-                          <div className="timeline-card-timestamp">
+                        <div className='timeline-card-column'>
+                          <div className='timeline-card-timestamp'>
                             <strong>Created At: </strong>
                             {new Date(ev.createdAt).toLocaleString()}
                           </div>
 
                           {dynamicFields.map(([key, value]) => (
-                            <div key={key} className="timeline-card-details">
+                            <div key={key} className='timeline-card-details'>
                               <strong>{key}: </strong> {String(value)}
                             </div>
                           ))}

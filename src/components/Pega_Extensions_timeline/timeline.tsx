@@ -70,6 +70,20 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data }) => {
 
   console.log(allDates);
 
+  // const eventsByDate = useMemo(() => {
+  //   const map: Record<string, any[]> = {};
+
+  //   allDates.forEach((d) => (map[d] = []));
+
+  //   normalizedEvents.forEach((ev) => {
+  //     const d = formatDate(ev.createdAt);
+  //     if (!map[d]) map[d] = [];
+  //     map[d].push(ev);
+  //   });
+
+  //   return map;
+  // }, [allDates, normalizedEvents]);
+
   const eventsByDate = useMemo(() => {
     const map: Record<string, any[]> = {};
 
@@ -79,6 +93,12 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data }) => {
       const d = formatDate(ev.createdAt);
       if (!map[d]) map[d] = [];
       map[d].push(ev);
+    });
+
+    // 🔥 SORT EVENTS INSIDE EACH DATE
+    Object.keys(map).forEach((date) => {
+      map[date].sort((a, b) => b.createdAt - a.createdAt); // ascending (older first)
+      // If you want latest first, use: b.createdAt - a.createdAt
     });
 
     return map;

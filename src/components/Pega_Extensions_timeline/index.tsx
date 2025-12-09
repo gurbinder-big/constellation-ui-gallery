@@ -71,6 +71,10 @@ const PegaExtensionsTimeline: React.FC<PegaExtensionsTimelineProps> = ({ getPCon
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const caseInfo = useMemo(() => {
+    return PConnect?.getValue((window as any).PCore.getConstants().CASE_INFO.CASE_INFO) || {};
+  }, [getPConnect]);
+
   useEffect(() => {
     if (!dataPage) return;
 
@@ -79,7 +83,13 @@ const PegaExtensionsTimeline: React.FC<PegaExtensionsTimelineProps> = ({ getPCon
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await (window as any).PCore.getDataApiUtils().getData(dataPage, {}, context);
+        const payload = {
+          dataViewParameters: {
+            CaseInstanceKey: caseInfo?.ID,
+          },
+        };
+        const response = await (window as any).PCore.getDataApiUtils().getData(dataPage, payload, context);
+
         const results = response?.data?.data ?? [];
         setData(results);
       } catch (e) {

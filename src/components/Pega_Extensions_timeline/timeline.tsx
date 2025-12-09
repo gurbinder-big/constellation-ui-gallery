@@ -194,7 +194,7 @@ interface TimelineWidgetProps {
   datapageName?: string;
   data?: any[];
   isLoading?: boolean;
-  dateField?: any;
+  dateField?: string;
   headingField?: string;
 }
 
@@ -203,24 +203,21 @@ const formatDate = (ts: number) => new Date(ts).toISOString().split('T')[0];
 const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data = [], dateField, headingField }) => {
   const [normalizedEvents, setNormalizedEvents] = useState<any[]>([]);
 
-  // ✅ Normalize incoming Pega data
+  // Normalize incoming Pega data
   useEffect(() => {
     if (!data || data.length === 0) return;
 
     const normalized = data.map((e, idx) => {
-      // Dynamic Date Field with fallbacks
-      const rawDate = (dateField && e[dateField]) || e.createdAt || e.CreatedAt || e.pxCreateDateTime;
+      const rawDate = (dateField && e[dateField]) || e.createdAt || e.CreatedAt;
+      const timestamp = rawDate && !isNaN(new Date(rawDate).getTime()) ? new Date(rawDate).getTime() : Date.now();
 
-      const timestamp = rawDate ? new Date(rawDate).getTime() : Date.now();
-
-      // Dynamic Heading Field with fallbacks
       const headerValue = (headingField && e[headingField]) || e.header || e.Header || e.Title || 'Event';
 
       return {
         ...e,
         id: e.id ?? idx + 1,
-        createdAt: timestamp, // normalized date key
-        header: headerValue, // normalized heading key
+        createdAt: timestamp,
+        header: headerValue,
         Color: e.Color || '#4285F4',
         Type: e.Type || 'unknown',
       };
@@ -229,7 +226,7 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data = [], dateField, h
     setNormalizedEvents(normalized);
   }, [data, dateField, headingField]);
 
-  // ✅ Compute all dates between first and last event
+  // Compute all dates between first and last event
   const allDates = useMemo(() => {
     if (normalizedEvents.length === 0) return [];
 
@@ -251,7 +248,7 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data = [], dateField, h
     return dates;
   }, [normalizedEvents]);
 
-  // ✅ Group events by date and sort
+  // Group events by date
   const eventsByDate = useMemo(() => {
     const map: Record<string, any[]> = {};
 
@@ -263,17 +260,12 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data = [], dateField, h
       map[d].push(ev);
     });
 
-    // Sort latest first
     Object.keys(map).forEach((date) => {
       map[date].sort((a, b) => a.createdAt - b.createdAt);
     });
 
     return map;
   }, [allDates, normalizedEvents]);
-
-  console.log(data, 'data from pega side');
-
-  console.log(dateField, headingField + 'Data value set for two fields');
 
   return (
     <div className='timeline-widget'>
@@ -303,20 +295,24 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data = [], dateField, h
                 eventsByDate[date]?.map((ev) => {
                   const icon = icons[ev.Type] || icons.unknown;
 
-                  const dynamicFields = Object.entries(ev).filter(
-                    ([k]) =>
-                      ![
-                        'id',
-                        'Color',
-                        'icon',
-                        'image',
-                        'createdAt',
-                        'pxCreateDateTime',
-                        'header',
-                        dateField,
-                        headingField,
-                      ].includes(k),
-                  );
+                  // Filter out system fields + null/empty fields
+                  const dynamicFields = Object.entries(ev).filter(([key, value]) => {
+                    const isSystemField = [
+                      'id',
+                      'Color',
+                      'icon',
+                      'image',
+                      'createdAt',
+                      'header',
+                      dateField,
+                      headingField,
+                    ].includes(key);
+
+                    const isEmpty =
+                      value === null || value === undefined || (typeof value === 'string' && value.trim() === '');
+
+                    return !isSystemField && !isEmpty;
+                  });
 
                   return (
                     <div key={ev.id} className='timeline-event'>

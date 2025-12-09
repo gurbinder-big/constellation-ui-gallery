@@ -1,3 +1,179 @@
+// import React, { useEffect, useMemo, useState } from 'react';
+
+// const icons: Record<string, string> = {
+//   order_created: '📝',
+//   payment_completed: '💰',
+//   warehouse_packed: '📦',
+//   shipped: '🚚',
+//   delivered: '📬',
+//   out_for_delivery: '📮',
+//   return_requested: '↩️',
+//   return_approved: '✔️',
+//   slaDeadline: '⏰',
+//   unknown: '❓',
+// };
+
+// interface TimelineWidgetProps {
+//   getPConnect?: () => any;
+//   datapageName?: string;
+//   data?: any[];
+//   isLoading?: boolean;
+// }
+
+// const formatDate = (ts: number) => new Date(ts).toISOString().split('T')[0];
+
+// const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data }) => {
+//   const [normalizedEvents, setNormalizedEvents] = useState<any[]>([]);
+
+//   useEffect(() => {
+//     if (!data) return;
+//     const normalized = data.map((e, idx) => {
+//       const timestamp = new Date(e.createdAt || e.CreatedAt).getTime();
+//       return {
+//         ...e,
+//         id: e.id ?? idx + 1,
+//         createdAt: timestamp,
+//         header: e.header || e.Label || e.Title || 'Event',
+//         Color: e.Color || '#4285F4',
+//         Type: e.Type || 'unknown',
+//       };
+//     });
+
+//     console.log(normalized);
+//     setNormalizedEvents(normalized);
+//   }, [data]);
+
+//   const allDates = useMemo(() => {
+//     if (normalizedEvents.length === 0) return [];
+
+//     const first = Math.min(...normalizedEvents.map((e) => e.createdAt));
+//     const last = Math.max(...normalizedEvents.map((e) => e.createdAt));
+
+//     console.log(first);
+//     console.log(last);
+
+//     const dates: string[] = [];
+
+//     const start = new Date(first);
+//     start.setUTCHours(0, 0, 0, 0);
+
+//     const end = new Date(last);
+//     end.setUTCHours(0, 0, 0, 0);
+
+//     while (start <= end) {
+//       dates.push(formatDate(start.getTime()));
+//       start.setUTCDate(start.getUTCDate() + 1);
+//     }
+
+//     return dates;
+//   }, [normalizedEvents]);
+
+//   console.log(allDates);
+
+//   // const eventsByDate = useMemo(() => {
+//   //   const map: Record<string, any[]> = {};
+
+//   //   allDates.forEach((d) => (map[d] = []));
+
+//   //   normalizedEvents.forEach((ev) => {
+//   //     const d = formatDate(ev.createdAt);
+//   //     if (!map[d]) map[d] = [];
+//   //     map[d].push(ev);
+//   //   });
+
+//   //   return map;
+//   // }, [allDates, normalizedEvents]);
+
+//   const eventsByDate = useMemo(() => {
+//     const map: Record<string, any[]> = {};
+
+//     allDates.forEach((d) => (map[d] = []));
+
+//     normalizedEvents.forEach((ev) => {
+//       const d = formatDate(ev.createdAt);
+//       if (!map[d]) map[d] = [];
+//       map[d].push(ev);
+//     });
+
+//     // 🔥 SORT EVENTS INSIDE EACH DATE
+//     Object.keys(map).forEach((date) => {
+//       map[date].sort((a, b) => b.createdAt - a.createdAt); // ascending (older first)
+//       // If you want latest first, use: b.createdAt - a.createdAt
+//     });
+
+//     return map;
+//   }, [allDates, normalizedEvents]);
+
+//   return (
+//     <div className='timeline-widget'>
+//       <div className='timeline-header'>
+//         <h2>Vertical Timeline</h2>
+//       </div>
+
+//       <div className='timeline-content'>
+//         <div className='timeline-vertical-line'></div>
+
+//         <div className='timeline-events'>
+//           {allDates.length == 0 && <p>dsadsaa </p>}
+
+//           {allDates.map((date) => (
+//             <div key={date} className='timeline-date-group'>
+//               <div className='timeline-date-label'>
+//                 {new Date(date).toLocaleDateString('en-US', {
+//                   day: 'numeric',
+//                   month: 'long',
+//                   year: 'numeric',
+//                 })}
+//               </div>
+
+//               {eventsByDate[date].length === 0 ? (
+//                 <div className='timeline-no-event'>No events</div>
+//               ) : (
+//                 eventsByDate[date].map((ev) => {
+//                   const dynamicFields = Object.entries(ev).filter(
+//                     ([k]) => !['id', 'Color', 'icon', 'image', 'createdAt', 'pxCreateDateTime'].includes(k),
+//                   );
+
+//                   const icon = icons[ev.Type] || icons['unknown'];
+
+//                   return (
+//                     <div key={ev.id} className='timeline-event'>
+//                       <div className='timeline-dot' style={{ backgroundColor: ev.Color }}>
+//                         <span className='timeline-dot-icon'>{icon}</span>
+//                       </div>
+
+//                       <div className='timeline-card' style={{ borderColor: ev.Color }}>
+//                         <div className='timeline-card-title' style={{ color: ev.Color }}>
+//                           {ev.header}
+//                         </div>
+
+//                         <div className='timeline-card-column'>
+//                           <div className='timeline-card-timestamp'>
+//                             <strong>Created At: </strong>
+//                             {new Date(ev.createdAt).toLocaleString()}
+//                           </div>
+
+//                           {dynamicFields.map(([key, value]) => (
+//                             <div key={key} className='timeline-card-details'>
+//                               <strong>{key}: </strong> {String(value)}
+//                             </div>
+//                           ))}
+//                         </div>
+//                       </div>
+//                     </div>
+//                   );
+//                 })
+//               )}
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default TimelineWidget;
+
 import React, { useEffect, useMemo, useState } from 'react';
 
 const icons: Record<string, string> = {
@@ -18,42 +194,49 @@ interface TimelineWidgetProps {
   datapageName?: string;
   data?: any[];
   isLoading?: boolean;
+  dateField?: any;
+  headingField?: string;
 }
 
 const formatDate = (ts: number) => new Date(ts).toISOString().split('T')[0];
 
-const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data }) => {
+const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data = [], dateField, headingField }) => {
   const [normalizedEvents, setNormalizedEvents] = useState<any[]>([]);
 
+  // ✅ Normalize incoming Pega data
   useEffect(() => {
-    if (!data) return;
+    if (!data || data.length === 0) return;
+
     const normalized = data.map((e, idx) => {
-      const timestamp = new Date(e.createdAt || e.CreatedAt).getTime();
+      // Dynamic Date Field with fallbacks
+      const rawDate = (dateField && e[dateField]) || e.createdAt || e.CreatedAt || e.pxCreateDateTime;
+
+      const timestamp = rawDate ? new Date(rawDate).getTime() : Date.now();
+
+      // Dynamic Heading Field with fallbacks
+      const headerValue = (headingField && e[headingField]) || e.header || e.Header || e.Title || 'Event';
+
       return {
         ...e,
         id: e.id ?? idx + 1,
-        createdAt: timestamp,
-        header: e.header || e.Label || e.Title || 'Event',
+        createdAt: timestamp, // normalized date key
+        header: headerValue, // normalized heading key
         Color: e.Color || '#4285F4',
         Type: e.Type || 'unknown',
       };
     });
 
-    console.log(normalized);
     setNormalizedEvents(normalized);
-  }, [data]);
+  }, [data, dateField, headingField]);
 
+  // ✅ Compute all dates between first and last event
   const allDates = useMemo(() => {
     if (normalizedEvents.length === 0) return [];
 
     const first = Math.min(...normalizedEvents.map((e) => e.createdAt));
     const last = Math.max(...normalizedEvents.map((e) => e.createdAt));
 
-    console.log(first);
-    console.log(last);
-
     const dates: string[] = [];
-
     const start = new Date(first);
     start.setUTCHours(0, 0, 0, 0);
 
@@ -68,22 +251,7 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data }) => {
     return dates;
   }, [normalizedEvents]);
 
-  console.log(allDates);
-
-  // const eventsByDate = useMemo(() => {
-  //   const map: Record<string, any[]> = {};
-
-  //   allDates.forEach((d) => (map[d] = []));
-
-  //   normalizedEvents.forEach((ev) => {
-  //     const d = formatDate(ev.createdAt);
-  //     if (!map[d]) map[d] = [];
-  //     map[d].push(ev);
-  //   });
-
-  //   return map;
-  // }, [allDates, normalizedEvents]);
-
+  // ✅ Group events by date and sort
   const eventsByDate = useMemo(() => {
     const map: Record<string, any[]> = {};
 
@@ -95,14 +263,17 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data }) => {
       map[d].push(ev);
     });
 
-    // 🔥 SORT EVENTS INSIDE EACH DATE
+    // Sort latest first
     Object.keys(map).forEach((date) => {
-      map[date].sort((a, b) => b.createdAt - a.createdAt); // ascending (older first)
-      // If you want latest first, use: b.createdAt - a.createdAt
+      map[date].sort((a, b) => a.createdAt - b.createdAt);
     });
 
     return map;
   }, [allDates, normalizedEvents]);
+
+  console.log(data, 'data from pega side');
+
+  console.log(dateField, headingField + 'Data value set for two fields');
 
   return (
     <div className='timeline-widget'>
@@ -114,7 +285,7 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data }) => {
         <div className='timeline-vertical-line'></div>
 
         <div className='timeline-events'>
-          {allDates.length == 0 && <p>dsadsaa </p>}
+          {allDates.length === 0 && <p>No Events</p>}
 
           {allDates.map((date) => (
             <div key={date} className='timeline-date-group'>
@@ -126,15 +297,26 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data }) => {
                 })}
               </div>
 
-              {eventsByDate[date].length === 0 ? (
+              {eventsByDate[date]?.length === 0 ? (
                 <div className='timeline-no-event'>No events</div>
               ) : (
-                eventsByDate[date].map((ev) => {
-                  const dynamicFields = Object.entries(ev).filter(
-                    ([k]) => !['id', 'Color', 'icon', 'image', 'createdAt', 'pxCreateDateTime'].includes(k),
-                  );
+                eventsByDate[date]?.map((ev) => {
+                  const icon = icons[ev.Type] || icons.unknown;
 
-                  const icon = icons[ev.Type] || icons['unknown'];
+                  const dynamicFields = Object.entries(ev).filter(
+                    ([k]) =>
+                      ![
+                        'id',
+                        'Color',
+                        'icon',
+                        'image',
+                        'createdAt',
+                        'pxCreateDateTime',
+                        'header',
+                        dateField,
+                        headingField,
+                      ].includes(k),
+                  );
 
                   return (
                     <div key={ev.id} className='timeline-event'>
@@ -149,7 +331,7 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data }) => {
 
                         <div className='timeline-card-column'>
                           <div className='timeline-card-timestamp'>
-                            <strong>Created At: </strong>
+                            <strong>{dateField || 'CreatedAt'}: </strong>
                             {new Date(ev.createdAt).toLocaleString()}
                           </div>
 

@@ -3,7 +3,7 @@
   "label": "Timeline",
   "description": "Timeline Widget to display events from Pega Data Pages",
   "organization": "Pega",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "library": "Extensions",
   "componentKey": "Pega_Extensions_Timeline",
   "type": "Widget",
@@ -16,9 +16,23 @@
       "label": "Data Page name",
       "format": "TEXT",
       "required": true
+    },
+    {
+      "name": "dateField",
+      "label": "Date Field (ex: CreatedAt)",
+      "format": "TEXT",
+      "required": false
+    },
+    {
+      "name": "headingField",
+      "label": "Heading Field (ex: Header)",
+      "format": "TEXT",
+      "required": false
     }
   ],
   "defaultConfig": {
-    "datapageName": ""
+    "datapageName": "",
+    "dateField": "",
+    "headingField": ""
   }
 }

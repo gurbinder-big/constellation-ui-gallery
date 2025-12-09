@@ -18,6 +18,7 @@ import '../shared/create-nonce';
 export type PegaExtensionsTaskListProps = {
   heading: string;
   dataPage: string;
+  saveableDataPage: string;
   getPConnect: () => any;
 };
 // Task type definition
@@ -28,7 +29,7 @@ export interface Task {
 }
 
 export const PegaExtensionsTaskList = (props: PegaExtensionsTaskListProps) => {
-  const { heading, dataPage, getPConnect } = props;
+  const { heading, dataPage, saveableDataPage, getPConnect } = props;
   const [taskListData, setTaskListData] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -40,13 +41,12 @@ export const PegaExtensionsTaskList = (props: PegaExtensionsTaskListProps) => {
       const newTaskData = {
         Id: createUID(),
         Label: newTask,
-        IsCompleted: false,
+        IsCompleted: false
       };
-      setTaskListData([...taskListData, newTaskData]);
-      if (inputRef.current) {
-        inputRef.current.value = '';
-        inputRef.current.focus();
-      }
+
+      setTaskListData(prev => [...prev, newTaskData]);
+      inputRef.current.value = '';
+      inputRef.current.focus();
     }
   };
 
@@ -57,9 +57,7 @@ export const PegaExtensionsTaskList = (props: PegaExtensionsTaskListProps) => {
   };
 
   const deleteTask = (id: string) => {
-    setTaskListData((prevData) => {
-      return prevData.filter((task) => task.Id !== id);
-    });
+     setTaskListData(prev => prev.filter(task => task.Id !== id));
   };
 
   useEffect(() => {
@@ -68,19 +66,14 @@ export const PegaExtensionsTaskList = (props: PegaExtensionsTaskListProps) => {
       const pConn = getPConnect();
       const CaseInstanceKey = pConn.getValue((window as any).PCore.getConstants().CASE_INFO.CASE_INFO_ID);
       const payload = {
-        dataViewParameters: [{ pyID: CaseInstanceKey }],
+        dataViewParameters: [{ pyID: CaseInstanceKey }]
       };
       (window as any).PCore.getDataApiUtils()
         .getData(dataPage, payload, pConn.getContextName())
         .then((response: any) => {
-          if (response.data.data !== null) {
-            setIsLoading(false);
-            if (response.data.data) {
-              setTaskListData(response.data.data);
-            } else {
-              setTaskListData([]);
-            }
-          }
+          const items = response?.data?.data || [];
+          setTaskListData(items);
+          setIsLoading(false);
         })
         .catch(() => {});
     } catch {
@@ -92,6 +85,7 @@ export const PegaExtensionsTaskList = (props: PegaExtensionsTaskListProps) => {
   if (error) {
     return <Banner variant='urgent' messages={[error]} />;
   }
+
   if (isLoading) {
     return (
       <Progress
@@ -124,7 +118,7 @@ export const PegaExtensionsTaskList = (props: PegaExtensionsTaskListProps) => {
         </StyledAddTask>
         <Container>
           {taskListData.map((task) => (
-            <TaskElement key={task.Id} task={task} deleteTask={deleteTask} getPConnect={getPConnect} />
+            <TaskElement key={task.Id} task={task} deleteTask={deleteTask} getPConnect={getPConnect} saveableDataPage={saveableDataPage} />
           ))}
         </Container>
       </CardContent>

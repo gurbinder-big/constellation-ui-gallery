@@ -26,6 +26,12 @@
             "required": true
         },
         {
+          "name": "saveableDataPage",
+          "label": "Savable Data Page ID",
+          "format": "TEXT",
+          "required": true
+        },
+        {
             "label": "Conditions",
             "format": "GROUP",
             "properties": [

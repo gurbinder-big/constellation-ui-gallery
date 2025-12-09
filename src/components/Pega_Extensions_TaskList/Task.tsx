@@ -1,23 +1,31 @@
 import { useRef, useState, useEffect } from 'react';
+import { Button, Checkbox, Icon, Input, registerIcon } from '@pega/cosmos-react-core';
+import * as trashIcon from '@pega/cosmos-react-core/lib/components/Icon/icons/trash.icon';
+import * as pencil from '@pega/cosmos-react-core/lib/components/Icon/icons/pencil.icon';
 import { TaskCard } from './styles';
-import { Button, Checkbox, Icon, Input } from '@pega/cosmos-react-core';
 import type { Task } from './index';
+registerIcon(trashIcon, pencil);
+
 
 interface TaskElementProps {
   task: Task;
+  saveableDataPage: string;
   deleteTask: (id: string) => void;
   getPConnect: () => any;
 }
 const TaskElement = (props: TaskElementProps) => {
-  const { task, deleteTask, getPConnect } = props;
+  const { task, deleteTask, getPConnect, saveableDataPage } = props;
   const [status, setStatus] = useState(task.IsCompleted);
-
+  const [title, setTitle] = useState(task.Label);
   const [isEditing, setIsEditing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [title, setTitle] = useState(task.Label);
+
   useEffect(() => {
-    setTitle(task.Label);
-  }, [task.Label]);
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.value = title;
+    }
+  }, [isEditing]);
 
   const submitTask = () => {
     setIsEditing(false);
@@ -25,32 +33,27 @@ const TaskElement = (props: TaskElementProps) => {
   };
 
   const editTask = () => {
-    setIsEditing((prevValue) => {
-      inputRef.current?.focus();
-      if (inputRef.current) {
-        inputRef.current.value = title;
-      }
-      return !prevValue;
-    });
+    setIsEditing(true);
   };
 
   const toggleStatus = () => {
     setStatus((prevStatus) => {
+      const updatedValue = !prevStatus;
       // API call to update the backend
       (window as any).PCore.getRestClient()
         .invokeRestApi('updateDataObject', {
           queryPayload: {
-            data_view_ID: 'D_TaskListSavable',
+            data_view_ID: saveableDataPage,
           },
           body: {
             data: {
               Id: task.Id, // Send the task Id as pyGUID
-              IsCompleted: !prevStatus, // Send the updated Status
+              IsCompleted: updatedValue, // Send the updated Status
             },
           },
         })
         .catch(() => {});
-      return !prevStatus;
+      return updatedValue;
     });
   };
 
@@ -59,7 +62,7 @@ const TaskElement = (props: TaskElementProps) => {
       {isEditing ? (
         <>
           <Input label={getPConnect().getLocalizedValue('Task name')} labelHidden ref={inputRef} />
-          <Button variant='text' label={getPConnect().getLocalizedValue('Submit task')} onClick={submitTask}>
+          <Button icon variant='text' label={getPConnect().getLocalizedValue('Submit task')} onClick={submitTask}>
             <Icon name='check' />
           </Button>
         </>

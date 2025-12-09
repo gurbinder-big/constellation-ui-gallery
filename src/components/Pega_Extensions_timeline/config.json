@@ -19,20 +19,20 @@
     },
     {
       "name": "dateField",
-      "label": "Date Field (ex: CreatedAt)",
+      "label": "CreatedAt",
       "format": "TEXT",
       "required": false
     },
     {
       "name": "headingField",
-      "label": "Heading Field (ex: Header)",
+      "label": "Header",
       "format": "TEXT",
       "required": false
     }
   ],
   "defaultConfig": {
     "datapageName": "",
-    "dateField": "",
-    "headingField": ""
+    "CreatedAt": "",
+    "Header": ""
   }
 }

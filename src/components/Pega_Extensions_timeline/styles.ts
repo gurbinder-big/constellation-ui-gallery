@@ -1,125 +1,128 @@
 import styled, { css } from 'styled-components';
 
-export default styled.div(() => {
-  return css`
-    margin: 0px 0;
+export default styled.div(
+  () => css`
+    /* ✅ Make styles work inside Pega Dev Studio */
+    :host {
+      all: initial;
+    }
 
-    .timeline-widget {
-      width: 90%;
-      margin: 20px auto;
+    & {
       font-family: Arial, sans-serif;
+      display: block;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    /* -------- Root Container -------- */
+    .timeline-widget {
+      width: 100%;
+      max-width: 900px;
+      margin: 20px auto;
     }
 
     .timeline-header {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
 
+    /* -------- Timeline Layout -------- */
     .timeline-content {
       position: relative;
-      padding-left: 190px;
+      padding-left: 200px;
     }
 
     .timeline-vertical-line {
       position: absolute;
       left: 190px;
-      top: 5px;
-      width: 2px;
+      top: 0;
+      width: 3px;
       height: 100%;
-      background-color: #ccc;
+      background: #d0d0d0;
+      border-radius: 4px;
     }
 
+    /* -------- Date Section -------- */
     .timeline-date-group {
+      position: relative;
       margin-bottom: 30px;
     }
 
     .timeline-date-label {
       position: absolute;
-      left: 0;
-      width: 160px;
+      left: -200px;
+      width: 180px;
       text-align: left;
-      font-weight: bold;
-      margin-bottom: 10px;
-      font-size: 16px;
+      font-weight: 700;
+      font-size: 15px;
+      color: #333;
     }
 
+    /* -------- Timeline Event -------- */
     .timeline-event {
       position: relative;
       margin-left: 40px;
-      margin-bottom: 15px;
-      width: calc(100% - 40px) !important;
+      margin-top: 30px;
     }
 
     .timeline-dot {
       position: absolute;
-      left: -59px;
-      top: 0px;
-      width: 40px;
-      height: 40px;
+      left: -62px;
+      top: 0;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
-      border: 2px solid white;
+      border: 2px solid #fff;
       display: flex;
-      justify-content: center;
       align-items: center;
-    }
-
-    .timeline-dot-img {
-      width: 20px;
-      height: 20px;
-      object-fit: contain;
+      justify-content: center;
     }
 
     .timeline-dot-icon {
       font-size: 16px;
-      color: white;
-      font-weight: bold;
-      line-height: 1;
+      color: #fff;
     }
 
+    /* -------- Card -------- */
     .timeline-card {
-      padding: 15px 15px 5px 15px;
+      padding: 14px 16px;
       border: 2px solid #ccc;
-      border-radius: 6px;
-      background-color: #fff;
-      box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.1);
-      width: 100%;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
     }
 
     .timeline-card-title {
-      font-weight: bold;
-      margin-bottom: 15px;
-      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      font-size: 16px;
     }
 
     .timeline-card-timestamp {
-      font-size: 14px;
+      font-size: 13px;
       color: #555;
-      margin-bottom: 10px;
-    }
-
-    .timeline-card-details {
-      font-size: 14px;
-      color: #333;
-    }
-
-    .timeline-no-event {
-      margin-left: 20px;
-      font-style: italic;
-      color: #888;
+      margin-bottom: 12px;
     }
 
     .timeline-card-column {
       display: flex;
       flex-wrap: wrap;
+      gap: 10px;
     }
 
     .timeline-card-column div {
-      flex: 0 50%;
-      margin-bottom: 10px;
+      flex: 0 0 48%;
+      font-size: 13px;
     }
 
-    .timeline-card-column .timeline-card-details.timeline-card-details-message {
-      flex: 100%;
+    .timeline-no-event {
+      margin-left: 40px;
+      font-style: italic;
+      color: #888;
     }
-  `;
-});
+  `,
+);

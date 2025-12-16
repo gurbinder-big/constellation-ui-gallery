@@ -1,84 +1,7 @@
-// import React, { useEffect, useState, useMemo } from 'react';
-// import TimelineWidget from './timeline';
-// import StyledPegaExtensionsTimelineWrapper from './styles';
-// import './Timeline.css';
-
-// interface PegaExtensionsTimelineProps {
-//   getPConnect?: () => any;
-// }
-
-// const PegaExtensionsTimeline: React.FC<PegaExtensionsTimelineProps> = ({ getPConnect }) => {
-//   const PConnect = getPConnect?.() ?? null;
-
-//   // ✅ Read config dynamically from Pega
-//   const configProps = useMemo(() => {
-//     return PConnect?.getConfigProps?.() ?? {};
-//   }, [PConnect]);
-
-//   const dataPage = configProps?.dataPage;
-//   const dateField = configProps?.dateField;
-//   const headingField = configProps?.headingField;
-
-//   const [data, setData] = useState<any[]>([]);
-//   const [loading, setLoading] = useState(false);
-
-//   const caseInfo = useMemo(() => {
-//     return PConnect?.getValue((window as any).PCore.getConstants().CASE_INFO.CASE_INFO) || {};
-//   }, [getPConnect]);
-
-//   useEffect(() => {
-//     if (!dataPage) return;
-
-//     const context = PConnect?.getContextName?.() ?? '';
-
-//     const fetchData = async () => {
-//       try {
-//         setLoading(true);
-//         const payload = {
-//           dataViewParameters: {
-//             CaseInstanceKey: caseInfo?.ID,
-//           },
-//         };
-//         const response = await (window as any).PCore.getDataApiUtils().getData(dataPage, payload, context);
-
-//         const results = response?.data?.data ?? [];
-//         setData(results);
-//       } catch (e) {
-//         console.error('Timeline fetch error:', e);
-//         setData([]);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchData();
-//   }, [dataPage, PConnect]);
-
-//   if (loading) return <div>Loading...</div>;
-//   if (!data.length) return <div>No Data</div>;
-
-//   return (
-//     <StyledPegaExtensionsTimelineWrapper>
-//       <div className='pega-timeline-container'>
-//         <TimelineWidget
-//           getPConnect={getPConnect}
-//           data={data}
-//           datapageName={dataPage}
-//           isLoading={loading}
-//           dateField={dateField} // ✅ now dynamic
-//           headingField={headingField} // ✅ now dynamic
-//         />
-//       </div>
-//     </StyledPegaExtensionsTimelineWrapper>
-//   );
-// };
-
-// export default PegaExtensionsTimeline;
-
 import React, { useEffect, useState, useMemo } from 'react';
 import TimelineWidget from './timeline';
-import StyledPegaExtensionsTimelineWrapper from './styles';
-import './Timeline.css';
+// import StyledPegaExtensionsTimelineWrapper from './styles';
+// import './Timeline.css';
 
 interface PegaExtensionsTimelineProps {
   getPConnect?: () => any;
@@ -124,18 +47,17 @@ const PegaExtensionsTimeline: React.FC<PegaExtensionsTimelineProps> = ({ getPCon
   if (!data.length) return <div>No Data</div>;
 
   return (
-    <StyledPegaExtensionsTimelineWrapper>
-      <div className='pega-timeline-container'>
-        <TimelineWidget
-          getPConnect={getPConnect}
-          data={data}
-          datapageName={dataPage}
-          isLoading={loading}
-          dateField={dateField}
-          headingField={headingField}
-        />
-      </div>
-    </StyledPegaExtensionsTimelineWrapper>
+    // <StyledPegaExtensionsTimelineWrapper></StyledPegaExtensionsTimelineWrapper>
+    <div className='pega-timeline-container'>
+      <TimelineWidget
+        getPConnect={getPConnect}
+        data={data}
+        datapageName={dataPage}
+        isLoading={loading}
+        dateField={dateField}
+        headingField={headingField}
+      />
+    </div>
   );
 };
 

@@ -33,7 +33,7 @@ export default styled.div(
     /* -------- Timeline Layout -------- */
     .timeline-content {
       position: relative;
-      padding-left: 200px;
+      padding-left: 0px;
     }
 
     .timeline-vertical-line {

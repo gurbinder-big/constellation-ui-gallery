@@ -1,0 +1,38 @@
+{
+  "name": "Pega_Extensions_TimelineZoom",
+  "label": "TimelineZoom",
+  "description": "TimelineZoom Widget to display events from Pega Data Pages",
+  "organization": "Pega",
+  "version": "4.0.3",
+  "library": "Extensions",
+  "componentKey": "Pega_Extensions_TimelineZoom",
+  "type": "Widget",
+  "subtype": ["PAGE", "CASE"],
+  "subtypeLabel": "PAGE and CASE",
+  "icon": "OneColumnPage.svg",
+  "properties": [
+    {
+      "name": "dataPage",
+      "label": "Data Page name",
+      "format": "TEXT",
+      "required": true
+    },
+    {
+      "name": "dateField",
+      "label": "CreatedAt",
+      "format": "TEXT",
+      "required": false
+    },
+    {
+      "name": "headingField",
+      "label": "Header",
+      "format": "TEXT",
+      "required": false
+    }
+  ],
+  "defaultConfig": {
+    "datapageName": "",
+    "CreatedAt": "",
+    "Header": ""
+  }
+}

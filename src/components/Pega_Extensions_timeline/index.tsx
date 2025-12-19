@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import TimelineWidget from './timeline';
-// import StyledPegaExtensionsTimelineWrapper from './styles';
+import { StyledStarWrapper, Label } from './styles';
 // import './Timeline.css';
 
 interface PegaExtensionsTimelineProps {
@@ -47,17 +47,21 @@ const PegaExtensionsTimeline: React.FC<PegaExtensionsTimelineProps> = ({ getPCon
   if (!data.length) return <div>No Data</div>;
 
   return (
-    // <StyledPegaExtensionsTimelineWrapper></StyledPegaExtensionsTimelineWrapper>
-    <div className='pega-timeline-container'>
-      <TimelineWidget
-        getPConnect={getPConnect}
-        data={data}
-        datapageName={dataPage}
-        isLoading={loading}
-        dateField={dateField}
-        headingField={headingField}
-      />
-    </div>
+    <>
+      <Label>okkk</Label>
+      <StyledStarWrapper>
+        <div className='pega-timeline-container star'>
+          <TimelineWidget
+            getPConnect={getPConnect}
+            data={data}
+            datapageName={dataPage}
+            isLoading={loading}
+            dateField={dateField}
+            headingField={headingField}
+          />
+        </div>
+      </StyledStarWrapper>
+    </>
   );
 };
 

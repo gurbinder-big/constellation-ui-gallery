@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { withConfiguration } from '@pega/cosmos-react-core';
 import TimelineWidget from './timeline';
-import { StyledStarWrapper, Label } from './styles';
+import { StyledStarWrapper } from './styles';
 // import './Timeline.css';
 
 interface PegaExtensionsTimelineProps {
@@ -48,9 +49,8 @@ const PegaExtensionsTimeline: React.FC<PegaExtensionsTimelineProps> = ({ getPCon
 
   return (
     <>
-      <Label>okkk</Label>
       <StyledStarWrapper>
-        <div className='pega-timeline-container star'>
+        <div className='pega-timeline-container'>
           <TimelineWidget
             getPConnect={getPConnect}
             data={data}
@@ -65,4 +65,4 @@ const PegaExtensionsTimeline: React.FC<PegaExtensionsTimelineProps> = ({ getPCon
   );
 };
 
-export default PegaExtensionsTimeline;
+export default withConfiguration(PegaExtensionsTimeline);

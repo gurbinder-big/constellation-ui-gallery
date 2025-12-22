@@ -32,24 +32,24 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data = [], dateField, h
     if (!data || data.length === 0) return;
 
     const hasValidDateSource = data.every((e) =>
-      dateField ? e[dateField] : e.createdAt || e.CreatedAt
+      dateField ? e[dateField] : e.createdAt || e.CreatedAt || e.pxTimeCreated,
     );
 
     if (!hasValidDateSource) {
-       setError(
-         dateField
-           ? `Date field "${dateField}" not found in one or more events`
-           : 'createdAt is missing and no dateField was provided, Please configure a dateField for the Timeline component configuration'
-       );
-       setNormalizedEvents([]);
-       return;
-     }
+      setError(
+        dateField
+          ? `Date field "${dateField}" not found in one or more events`
+          : 'createdAt is missing and no dateField was provided, Please configure a dateField for the Timeline component configuration',
+      );
+      setNormalizedEvents([]);
+      return;
+    }
 
-     setError(null);
+    setError(null);
 
     const normalized = data.map((e, idx) => {
-      const rawDate = (dateField && e[dateField]) || e.createdAt || e.CreatedAt;
-      // const timestamp = rawDate && !isNaN(new Date(rawDate).getTime()) ? new Date(rawDate).getTime() : Date.now();
+      const rawDate = (dateField && e[dateField]) || e.createdAt || e.CreatedAt || e.pxTimeCreated;
+
       const timestamp = new Date(rawDate).getTime();
 
       const headerValue = (headingField && e[headingField]) || e.header || e.Header || e.Title || 'Event';
@@ -60,7 +60,7 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data = [], dateField, h
         createdAt: timestamp,
         header: headerValue,
         Color: e.Color || '#4285F4',
-        Type: e.Type || 'unknown',
+        Type: e.Type || 'unknown', // still used for icon
       };
     });
 
@@ -69,6 +69,7 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data = [], dateField, h
 
   const allDates = useMemo(() => {
     if (normalizedEvents.length === 0) return [];
+
     const first = Math.min(...normalizedEvents.map((e) => e.createdAt));
     const last = Math.max(...normalizedEvents.map((e) => e.createdAt));
 
@@ -83,11 +84,13 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data = [], dateField, h
       dates.push(formatDate(start.getTime()));
       start.setUTCDate(start.getUTCDate() + 1);
     }
+
     return dates;
   }, [normalizedEvents]);
 
   const eventsByDate = useMemo(() => {
     const map: Record<string, any[]> = {};
+
     allDates.forEach((d) => (map[d] = []));
 
     normalizedEvents.forEach((ev) => {
@@ -101,11 +104,13 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data = [], dateField, h
     return map;
   }, [allDates, normalizedEvents]);
 
-  console.log(data, 'data from pega side');
-
   if (error) {
-    return <div className="timeline-error">{error}</div>;
+    return <div className='timeline-error'>{error}</div>;
   }
+
+  console.log(allDates, 'allDates Data from pega side');
+
+  console.log(eventsByDate, ' eventsByDate Data from pega side');
 
   return (
     <div className='timeline-container'>
@@ -135,12 +140,29 @@ const TimelineWidget: React.FC<TimelineWidgetProps> = ({ data = [], dateField, h
                 const icon = icons[ev.Type] || icons.unknown;
 
                 const dynamicFields = Object.entries(ev).filter(([key, value]) => {
-                  const isSystemField = ['id', 'Color', 'createdAt', 'header', dateField, headingField].includes(key);
+                  const hiddenFields = [
+                    'id',
+                    'Color',
+                    'createdAt',
+                    'header',
+                    'Type',
+                    'pxObjClass',
+                    'pyPerformer',
+                    'pxInsName',
+                    'pxHistoryForReference',
+                    'pzInsKey',
+                    'pxTimeCreated',
+                    'pyMemo',
+                    dateField,
+                    headingField,
+                  ];
+
+                  const isHidden = hiddenFields.includes(key);
 
                   const isEmpty =
                     value === null || value === undefined || (typeof value === 'string' && value.trim() === '');
 
-                  return !isSystemField && !isEmpty;
+                  return !isHidden && !isEmpty;
                 });
 
                 return (

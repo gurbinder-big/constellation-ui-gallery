@@ -1,0 +1,41 @@
+{
+  "name": "Pega_Extensions_DataMigAccel",
+  "label": "Data Migration Acceleration",
+  "description": "Data Migration Acceleration",
+  "organization": "Pega",
+  "version": "1.0.0",
+  "library": "Extensions",
+  "allowedApplications": [],
+  "componentKey": "Pega_Extensions_DataMigAccel",
+  "type": "Widget",
+  "subtype": [
+      "PAGE",
+      "CASE"
+  ],
+  "properties": [
+    {
+      "name": "dataBaseDataPage",
+      "label": "Data Base Data Page",
+      "format": "TEXT"
+    },
+    {
+      "name": "caseTypesDataPage",
+      "label": "Case Types Data Page",
+      "format": "TEXT"
+    },
+    {
+      "name": "schemaNamesDataPage",
+      "label": "Schema Names Data Page",
+      "format": "TEXT"
+    },
+    {
+      "name": "dataTypesDataPage",
+      "label": "Data Types Data Page",
+      "format": "TEXT"
+    }
+  ],
+  "defaultConfig": {
+    "label": "@L $this.label",
+    "localAction": ""
+  }
+}

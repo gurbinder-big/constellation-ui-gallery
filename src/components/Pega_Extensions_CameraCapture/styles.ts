@@ -56,5 +56,19 @@ export default styled.div(() => {
       border-left: 0;
       border-radius: 0 6px 6px 0;
     }
+
+    .custom-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #076bc9;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 9999;
+    }
+
   `;
 });

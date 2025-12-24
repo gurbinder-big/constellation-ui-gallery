@@ -1,28 +1,32 @@
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, Flex, Button, Input, withConfiguration} from '@pega/cosmos-react-core';
-import type { PConnFieldProps } from './PConnProps';
 import StyledPegaExtensionsCameraCaptureWrapper from './styles';
 
-function PegaExtensionsCameraCapture(props: PConnFieldProps) {
-  const { getPConnect } = props;
+type CameraComponentProps = {
+  buttonText: string;
+  getPConnect: any;
+};
+
+function PegaExtensionsCameraCapture(props: CameraComponentProps) {
+  const { getPConnect, buttonText } = props;
 
   const [attachmentFieldName, setAttachmentFieldName] = useState('');
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  const [showToast, setShowToast] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
   const [capturedImg, setCapturedImg] = useState<string | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [videoDims, setVideoDims] = useState<{ width: number; height: number } | null>(null);
   const [containerWidth, setContainerWidth] = useState<number>(0);
-  const context = getPConnect().getContextName();
-
-  const generateUniqueID = () => '_' + Math.random().toString(36).substr(2, 9);
+  const pConn = useMemo(() => getPConnect(), [getPConnect]);
+  const context = pConn.getContextName();
 
   const caseInfo = useMemo(() => {
     return (
-      getPConnect().getValue((window as any).PCore.getConstants().CASE_INFO.CASE_INFO) || {}
+      pConn.getValue((window as any).PCore.getConstants().CASE_INFO.CASE_INFO) || {}
     );
   }, [getPConnect]);
 
@@ -91,11 +95,11 @@ function PegaExtensionsCameraCapture(props: PConnFieldProps) {
     setCameraActive(false);
   }, [stream]);
 
-  useEffect(() => {
-    return () => {
-      stopCamera();
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     stopCamera();
+  //   };
+  // }, []);
 
 
   const handleLoadedMetadata = () => {
@@ -172,11 +176,11 @@ function PegaExtensionsCameraCapture(props: PConnFieldProps) {
       category: 'File',
       attachmentFieldName: 'File',
       fileType: 'PNG',
-      name: attachmentFieldName || name,
+      name: name,
       ID: id
     };
 
-    await PCore.getAttachmentUtils().linkAttachmentsToCase(
+    await (window as any).PCore.getAttachmentUtils().linkAttachmentsToCase(
       caseInfo?.ID,
       [file],
       'File',
@@ -191,30 +195,38 @@ function PegaExtensionsCameraCapture(props: PConnFieldProps) {
   const handleUpload = async () => {
     if (!capturedImg) return;
 
-    const id = generateUniqueID();
-    const file = base64ToFile(capturedImg, `camera_capture_${id}.png`);
+    const id = crypto.randomUUID();
+    const fileName = `${attachmentFieldName || `camera_capture_${id}`}.png`;
+    const file = base64ToFile(capturedImg, fileName);
     (file as any).ID = id;
 
     console.log(file);
 
-    const res = await PCore.getAttachmentUtils().uploadAttachment(
+    const res = await (window as any).PCore.getAttachmentUtils().uploadAttachment(
       file as any,
       onUploadProgress,
       errorHandler,
       context
     );
-    linkFile((res as any).ID, id);
+    linkFile((res as any).ID, fileName);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
   };
 
   return (
     <StyledPegaExtensionsCameraCaptureWrapper>
+      {showToast && (
+        <div className="custom-toast">
+          Attachment added to case successfully
+        </div>
+      )}
       <Card>
         <CardContent>
           <Flex container={{ direction: 'column', gap: 2 }}>
             {!cameraActive && !capturedImg && (
               <Flex container={{ gap: 2 }}>
                 <Button variant="primary" onClick={startCamera} className='camera-buttons'>
-                  Capture with Camera
+                  { buttonText }
                 </Button>
               </Flex>
             )}

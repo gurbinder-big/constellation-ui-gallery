@@ -3,11 +3,12 @@ import type { ChangeEvent, FC } from 'react';
 // import './Autocomplete.css';
 
 interface AutocompleteProps {
+  disabled?: boolean;
   options: string[];
   onSelect?: (value: string) => void;
 }
 
-const Autocomplete: FC<AutocompleteProps> = ({ options, onSelect }) => {
+const Autocomplete: FC<AutocompleteProps> = ({ options, onSelect, disabled = false }) => {
   const [inputValue, setInputValue] = useState<string>('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
@@ -52,6 +53,7 @@ const Autocomplete: FC<AutocompleteProps> = ({ options, onSelect }) => {
   return (
     <div className="autocomplete-container" ref={containerRef}>
       <input
+        disabled={disabled}
         type="text"
         value={inputValue}
         placeholder="Type to search"

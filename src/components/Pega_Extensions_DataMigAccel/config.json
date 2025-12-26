@@ -24,13 +24,28 @@
       "format": "TEXT"
     },
     {
+      "name": "caseTypesPropsDataPage",
+      "label": "Case Types Properties Data Page",
+      "format": "TEXT"
+    },
+    {
       "name": "schemaNamesDataPage",
       "label": "Schema Names Data Page",
       "format": "TEXT"
     },
     {
+      "name": "tableNamesDataPage",
+      "label": "Table Names Data Page",
+      "format": "TEXT"
+    },
+    {
       "name": "dataTypesDataPage",
       "label": "Data Types Data Page",
+      "format": "TEXT"
+    },
+    {
+      "name": "tableDetailsDataPage",
+      "label": "Table Details Data Page",
       "format": "TEXT"
     }
   ],

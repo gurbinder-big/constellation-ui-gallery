@@ -27,7 +27,31 @@ const mockData = {
           "pyLabel": "dummy"
         },
         {
-          "pyLabel": "dummy"
+          "pyLabel": "dummy2"
+        }
+      ]
+    }
+  },
+  tableNamesDataPage: {
+    data : {
+      data: [
+        {
+          "table_name": "address"
+        },
+        {
+          "table_name": "categories"
+        }
+      ]
+    }
+  },
+  tableDetailsDataPage: {
+    data : {
+      data: [
+        {
+          "column_name": "name"
+        },
+        {
+          "column_name": "email"
         }
       ]
     }
@@ -39,7 +63,7 @@ const mockData = {
           "SchemaName": "dummy"
         },
         {
-          "SchemaName": "dummy"
+          "SchemaName": "dummy2"
         }
       ]
     }
@@ -60,13 +84,28 @@ const mockData = {
     data : {
       data: [
         {
-          "pyClassName": "BIG-GDM-Work-DataMigration"
+          "pyLabel": "BIG-GDM-Work-DataMigration"
         },
         {
-          "pyClassName": "BIG-GDM-Work-DataMigration"
+          "pyLabel": "BIG-GDM-Work-DataMigration"
         },
         {
-          "pyClassName": "BIG-GDM-Work-DataMigration"
+          "pyLabel": "BIG-GDM-Work-DataMigration"
+        }
+      ]
+    }
+  },
+  caseTypesPropsDataPage: {
+    data : {
+      data: [
+        {
+          "pyPropertyName": "Name"
+        },
+        {
+          "pyPropertyName": "Id"
+        },
+        {
+          "pyPropertyName": "Email"
         }
       ]
     }
@@ -81,10 +120,16 @@ window.PCore.getDataPageUtils = () => {
           return Promise.resolve(mockData.dataTypesDataPage);
         case 'schemaNamesDataPage':
           return Promise.resolve(mockData.schemaNamesDataPage);
+        case 'tableNamesDataPage':
+          return Promise.resolve(mockData.tableNamesDataPage);
         case 'dataBaseDataPage':
           return Promise.resolve(mockData.dataBaseDataPage);
         case 'caseTypesDataPage':
           return Promise.resolve(mockData.caseTypesDataPage);
+        case 'caseTypesPropsDataPage':
+          return Promise.resolve(mockData.caseTypesPropsDataPage);
+        case 'tableDetailsDataPage':
+          return Promise.resolve(mockData.tableDetailsDataPage);
         default:
           return Promise.reject(new Error('Unknown endpoint'));
       }
@@ -100,10 +145,16 @@ window.PCore.getDataApiUtils = () => {
           return Promise.resolve(mockData.dataTypesDataPage);
         case 'schemaNamesDataPage':
           return Promise.resolve(mockData.schemaNamesDataPage);
+        case 'tableNamesDataPage':
+          return Promise.resolve(mockData.tableNamesDataPage);
         case 'dataBaseDataPage':
           return Promise.resolve(mockData.dataBaseDataPage);
         case 'caseTypesDataPage':
           return Promise.resolve(mockData.caseTypesDataPage);
+        case 'caseTypesPropsDataPage':
+          return Promise.resolve(mockData.caseTypesPropsDataPage);
+        case 'tableDetailsDataPage':
+          return Promise.resolve(mockData.tableDetailsDataPage);
         default:
           return Promise.reject(new Error('Unknown endpoint'));
       }
@@ -140,5 +191,8 @@ BaseComponent.args = {
   caseTypesDataPage: configProps.caseTypesDataPage,
   dataBaseDataPage: configProps.dataBaseDataPage,
   dataTypesDataPage: configProps.dataTypesDataPage,
-  schemaNamesDataPage: configProps.schemaNamesDataPage
+  schemaNamesDataPage: configProps.schemaNamesDataPage,
+  tableNamesDataPage: configProps.tableNamesDataPage,
+  caseTypesPropsDataPage: configProps.caseTypesPropsDataPage,
+  tableDetailsDataPage: configProps.tableDetailsDataPage
 };

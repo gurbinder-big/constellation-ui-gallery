@@ -42,12 +42,16 @@ type DatabaseProps = {
   dataBases: { pyRWDatabase: string }[];
   migrationTypes: { id: string; label: string }[];
   schemaNames: { SchemaName: string }[];
-  caseTypes: { pyClassName: string }[];
+  caseTypes: { pyLabel: string, pyCaseClass: string }[];
   dataTypes: { id: string; label: string }[];
   selectedDatabase: string;
   selectedMigrationType: string;
   setSelectedDatabase: (value: string) => void;
   setselectedMigrationType: (value: string) => void;
+  schemaName: string;
+  setschemaName: (value: string) => void;
+  selectedCaseType: string;
+  setselectedCaseType: (value: string) => void;
   onSubmit?: () => void;
 };
 
@@ -58,22 +62,31 @@ const Database = (props: DatabaseProps) => {
     schemaNames,
     caseTypes,
     dataTypes,
+
     selectedMigrationType,
+    setselectedMigrationType,
+
     selectedDatabase,
     setSelectedDatabase,
-    setselectedMigrationType,
+
+    schemaName,
+    setschemaName,
+
+    selectedCaseType,
+    setselectedCaseType,
     onSubmit,
   } = props;
 
-  const [schemaName, setschemaName] = useState('');
-  const [selectedCaseType, setselectedCaseType] = useState('');
   const [selectedDataType, setSelectedDataType] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    setschemaName('');
+    // setschemaName('dummy');
+    // setselectedCaseType('BIG-GDM-Work-DataMigration');
   }, [selectedDatabase]);
+
+  console.log('ok');
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -175,8 +188,8 @@ const Database = (props: DatabaseProps) => {
           >
             <option value=''>Select</option>
             {caseTypes.map((item, index) => (
-              <option key={index} value={item.pyClassName}>
-                {item.pyClassName}
+              <option key={index} value={item.pyCaseClass}>
+                { item.pyLabel }
               </option>
             ))}
           </select>
@@ -197,7 +210,7 @@ const Database = (props: DatabaseProps) => {
             required
           >
             <option value=''>Select</option>
-            {dataTypes.map((item, index) => (
+            {dataTypes.map((item: any, index) => (
               <option key={index} value={item.pyLabel}>
                 {item.pyLabel}
               </option>

@@ -59,6 +59,8 @@ const Mapping = (props: MappingProps) => {
 
   console.log(tables);
   console.log(joinCriteria);
+  console.log('caseTypeProperties');
+  console.log(caseTypeProperties);
 
 
   const [flows, setFlows] = useState<RowType[]>([]);
@@ -185,6 +187,10 @@ const Mapping = (props: MappingProps) => {
   };
 
 
+  const logJson = () => {
+    setshowJson((prev) => !prev);
+  }
+
   const test = () => {
     setshowJson((prev) => !prev);
   }
@@ -215,6 +221,20 @@ const Mapping = (props: MappingProps) => {
       )
     );
   };
+
+  const propertyNodeMap = React.useMemo(() => {
+    const buildNodeMap = (nodes = [], map = {}) => {
+      nodes.forEach(node => {
+        map[node.pyPropertyName] = node;
+        if (node.ChildProperties) {
+          buildNodeMap(node.ChildProperties, map);
+        }
+      });
+      return map;
+    };
+
+    return buildNodeMap(caseTypeProperties);
+  }, [caseTypeProperties]);
 
   return (
     <>
@@ -273,11 +293,14 @@ const Mapping = (props: MappingProps) => {
                   <td>
                     {
                       row.type !== 'primary' &&
-                      <Autocomplete
-                        disabled={row.type === 'primary'}
-                        options={caseTypeProperties}
-                        onSelect={(val) => updateRow(row.id, 'targetProperty', val)}
-                      />
+                      <select value={row.targetProperty} onChange={(e) => updateRow(row.id, 'targetProperty', e.target.value)}>
+                        <option value=''>Select</option>
+                        {caseTypeProperties.map((t) => (
+                          <option key={t.pyPropertyName} value={t.pyPropertyName}>
+                            { t.pyPropertyName }
+                          </option>
+                        ))}
+                      </select>
                     }
                   </td>
 
@@ -342,7 +365,7 @@ const Mapping = (props: MappingProps) => {
                       currentRow.mappings.map((mapping) => (
                       <tr key={mapping.id}>
                         <td>
-                          <select value={row.targetProperty} onChange={(e) => updateMappingField(currentRow.id, mapping.id, 'targetProperty', val)}>
+                          <select value={mapping.targetProperty} onChange={(e) => updateMappingField(currentRow.id, mapping.id, 'targetProperty', e.target.value)}>
                             <option value=''>Select</option>
                             { mockFields.map((t) => (
                               <option key={t} value={t}>
@@ -359,12 +382,14 @@ const Mapping = (props: MappingProps) => {
                         </td>
 
                         <td>
-                          {
-                            <Autocomplete
-                              options={currentRow.sourceTableColumns}
-                              onSelect={(val) => updateMappingField(currentRow.id, mapping.id, 'sourceProperty', val)}
-                            />
-                          }
+                          <select value={mapping.sourceProperty} onChange={(e) => updateMappingField(currentRow.id, mapping.id, 'sourceProperty', e.target.value)}>
+                            <option value=''>Select</option>
+                            { currentRow.sourceTableColumns.map((t) => (
+                              <option key={t} value={t}>
+                                {t}
+                              </option>
+                            ))}
+                          </select>
                         </td>
 
                         <td>
@@ -407,6 +432,42 @@ const Mapping = (props: MappingProps) => {
           )}
           { /* caseType & primary end */ }
 
+
+
+          { showJson === true && (
+
+            <div
+              style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(0,0,0,0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: '9999'
+              }}
+            >
+              <div
+                style={{
+                  background: '#fff',
+                  padding: 20,
+                  width: 800,
+                  borderRadius: 8,
+                }}
+              >
+                <p>
+                  <pre>{JSON.stringify(flows, null, 2)}</pre>
+                </p>
+
+                <Button onClick={() => setshowJson(false)} >
+                  Hide
+                </Button>
+
+              </div>
+            </div>
+          )}
+
+
           <Button compact={true} onClick={addRow}>
             Add Flow
           </Button>
@@ -414,6 +475,7 @@ const Mapping = (props: MappingProps) => {
           <br/>
 
           <Button type='submit'>Next</Button>
+          <Button onClick={logJson}>log json</Button>
         </div>
       </Form>
     </>

@@ -78,10 +78,10 @@ function DataMigAccelComponent(props: DashboardProps) {
     setSourceTypes(['primary', 'page', 'page list']);
     setjoinCriteria(['inner', 'left']);
 
-    // setSelectedDatabase('CustomerData');
-    // setselectedMigrationType('caseType');
-    // setschemaName('dummy');
-    // setselectedCaseType('BIG-GDM-Work-DataMigration');
+    setSelectedDatabase('CustomerData');
+    setselectedMigrationType('caseType');
+    setschemaName('dummy');
+    setselectedCaseType('BIG-GDM-Work-DataMigration');
 
   },[]);
 
@@ -177,9 +177,21 @@ function DataMigAccelComponent(props: DashboardProps) {
             CaseType: selectedCaseType,
           }
         });
-        setCaseTypeProperties(
-          (res?.data || []).map((row) => row.pyPropertyName )
-        );
+        const cleaned = res?.data.map(item => {
+          const result = {
+            pyPropertyName: item.pyPropertyName
+          };
+
+          if (Array.isArray(item.ChildProperties)) {
+            result.ChildProperties = item.ChildProperties.map(child => ({
+              pyPropertyName: child.pyPropertyName
+            }));
+          }
+
+          return result;
+        });
+
+        setCaseTypeProperties();
       } catch (err) {
         console.error('Error loading schema names:', err);
         setCaseTypeProperties([]);

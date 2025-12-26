@@ -36,10 +36,10 @@ const mockData = {
     data : {
       data: [
         {
-          "table_name": "address"
+          "table_name": "address_tbl"
         },
         {
-          "table_name": "categories"
+          "table_name": "categories_tbl"
         }
       ]
     }
@@ -48,10 +48,10 @@ const mockData = {
     data : {
       data: [
         {
-          "column_name": "name"
+          "column_name": "name_db_clm"
         },
         {
-          "column_name": "email"
+          "column_name": "email_db_clm"
         }
       ]
     }
@@ -99,13 +99,24 @@ const mockData = {
     data : {
       data: [
         {
-          "pyPropertyName": "Name"
+          "pyPropertyName": "pyName"
         },
         {
-          "pyPropertyName": "Id"
+          "pyPropertyName": "pyId",
+          "ChildProperties": [
+            {
+              "pyPropertyName": "pyName"
+            },
+            {
+              "pyPropertyName": "pyId"
+            },
+            {
+              "pyPropertyName": "pyEmail"
+            }
+          ]
         },
         {
-          "pyPropertyName": "Email"
+          "pyPropertyName": "pyEmail"
         }
       ]
     }

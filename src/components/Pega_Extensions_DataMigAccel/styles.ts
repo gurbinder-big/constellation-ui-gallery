@@ -6,6 +6,28 @@ const GlobalStyle = createGlobalStyle`
     background-color:#ffffff;
     font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 
+    .json-box {
+      max-height: 450px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+      overflow: auto;
+      padding: 12px;
+      border: 1px solid #ccc;
+      background: #f7f7f7;
+      font-family: monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    select.invalid {
+      border-color: #b83838;
+    }
+
+    .popup-error {
+      color: #b83838;
+    }
+
     .dx-stepper {
       display: flex;
       align-items: center;
@@ -85,7 +107,7 @@ const GlobalStyle = createGlobalStyle`
       background-color: #f9fafb;
       text-align: left;
       font-weight: 600;
-      padding: 5px;
+      padding: 10px 5px;
       border-bottom: 1px solid #e5e7eb;
     }
 

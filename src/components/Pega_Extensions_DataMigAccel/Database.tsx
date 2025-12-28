@@ -105,7 +105,7 @@ const Database = (props: DatabaseProps) => {
           DataBase name: <span className='required'>*</span>
         </label>
         <select
-          className={submitted && !selectedDatabase ? 'invalid' : ''}
+          className={submitted && !selectedDatabase ? 'invalid' : 'aa'}
           id='dataBase'
           name='dataBase'
           value={selectedDatabase}

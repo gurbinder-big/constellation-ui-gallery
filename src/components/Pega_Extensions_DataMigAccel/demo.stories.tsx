@@ -99,24 +99,40 @@ const mockData = {
     data : {
       data: [
         {
-          "pyPropertyName": "pyName"
+          "pyPropertyName": "pyAddress",
+          "ChildProperties": [
+            {
+              "pyPropertyName": "child_pycity"
+            },
+            {
+              "pyPropertyName": "child_pypin"
+            }
+          ]
         },
         {
           "pyPropertyName": "pyId",
           "ChildProperties": [
             {
-              "pyPropertyName": "pyName"
+              "pyPropertyName": "child_pyName"
             },
             {
-              "pyPropertyName": "pyId"
+              "pyPropertyName": "child_pyId"
             },
             {
-              "pyPropertyName": "pyEmail"
+              "pyPropertyName": "child_pyEmail"
             }
           ]
         },
         {
-          "pyPropertyName": "pyEmail"
+          "pyPropertyName": "pyEmail",
+          "ChildProperties": [
+            {
+              "pyPropertyName": "child_pyemail"
+            },
+            {
+              "pyPropertyName": "child_pyprimary"
+            }
+          ]
         }
       ]
     }

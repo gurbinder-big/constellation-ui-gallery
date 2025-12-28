@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import { Button, EmptyState, Icon } from '@pega/cosmos-react-core';
 import Autocomplete from './Autocomplete';
@@ -7,6 +7,31 @@ import { fetchListDataPage } from './apiUtils';
 const Form = styled.form`
   width: 100%;
 `;
+
+const Popup = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+`;
+
+const PopupInner = styled.div`
+  background: #fff;
+  padding: 20px;
+  width: 800px;
+  border-radius: 8px;
+`;
+
+const Table = styled.table`
+  width: '100%',
+  border-collapse: 'collapse',
+  margin-top: '12px',
+  margin-bottom: '12px',
+`;
+
 
 // component
 type MappingProps = {
@@ -20,7 +45,10 @@ type MappingProps = {
   tables: Record<string, any>[];
   sourceTypes: string[];
   joinCriteria: string[];
-  onSubmit?: () => void;
+  onSubmit?: (data: RowType[]) => void;
+  flowData: RowType[];
+  setFlowData: (data: RowType[]) => void;
+  setBack?: () => void;
 };
 
 //flow
@@ -28,6 +56,7 @@ type RowType = {
   id: number;
   type: string;
   targetProperty: string;
+  targetPropertyChilds: Record<string, any>[];
   sourceTableName: string;
   sourceTableColumns: string[];
   mappings: Record<string, any>[];
@@ -54,97 +83,102 @@ const Mapping = (props: MappingProps) => {
     selectedMigrationType,
     caseTypeProperties,
     sourceTypes,
-    joinCriteria
+    joinCriteria,
+    onSubmit,
+    flowData,
+    setFlowData,
+    setBack
   } = props;
 
-  console.log(tables);
-  console.log(joinCriteria);
-  console.log('caseTypeProperties');
-  console.log(caseTypeProperties);
 
-
-  const [flows, setFlows] = useState<RowType[]>([]);
   const [showJson, setshowJson] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [activeRow, setActiveRow] = useState<RowType | null>(null);
-  const mockFields = ['pyID', 'pyLabel', 'pyStatus'];
+
+  const [isPrimary, setIsPrimary] = useState(false);
+  const flowformRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    setFlows([{
-      id: Date.now(),
-      type: 'primary',
-      targetProperty: '',
-      sourceTableName: '',
-      sourceTableColumns: [],
-      mappings: []
-    }]);
-  }, []);
-
-  useEffect(() => {
-  }, []);
+    console.log('flowData after render:', flowData);
+  }, [flowData]);
 
   const addRow = () => {
-    setFlows((prev) => [
-      ...prev,
+    setFlowData([
+      ...flowData,
       {
-        id: Date.now(),
+        id: crypto.randomUUID(),
         type: '',
         targetProperty: '',
+        targetPropertyChilds: [],
         sourceTableName: '',
         sourceTableColumns: [],
         mappings: []
-      },
+      }
     ]);
   };
 
+  const updateRowWithChild = (id: number, key: string, value: string) => {
+    const childProps = propertyNodeMap[value]?.ChildProperties ?? [];
+    setFlowData(prev => {
+      const updated = prev.map(r =>
+        r.id === id
+          ? {
+              ...r,
+              [key]: value,
+              targetPropertyChilds: childProps
+            }
+          : r
+      );
+      return updated;
+    });
+  }
+
+  // const updateRow = (id: number, key: string, value: string) => {
+  //   setFlowData((prev) => prev.map((r) => (r.id === id ? { ...r, [key]: value } : r)));
+  // };
+
   const updateRow = (id: number, key: string, value: string) => {
-    setFlows((prev) => prev.map((r) => (r.id === id ? { ...r, [key]: value } : r)));
+    setFlowData( prev =>
+      prev.map(r => r.id === id ? { ...r, [key]: value } : r)
+    );
   };
 
   const deleteRow = (id: number) => {
-    setFlows((prev) => {
-      const row = prev.find((r) => r.id === id);
-      if (row?.type === 'primary') return prev;
-      return prev.filter((r) => r.id !== id);
-    });
+    setFlowData(flowData.filter(r => !(r.id === id && r.type !== 'primary')));
   };
 
   const openMapPopup = (row: RowType) => {
+    if (!row.sourceTableName) {
+      alert('Please select Source Table first');
+      return;
+    }
     setActiveRow(row);
+    setIsPrimary(row.type === 'primary');
     setShowPopup(true);
   };
 
   const closePopup = () => {
+    if (hasErrors) return;
     setShowPopup(false);
     setActiveRow(null);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // if (formRef.current?.checkValidity()) {
-    //   onSubmit?.();
-    // } else {
-    //   formRef.current?.reportValidity();
-    // }
-  };
+  const hasPrimary = flowData.some((r) => r.type === 'primary');
+  const currentRow = flowData.find(r => r.id === activeRow?.id);
+  const targetOptions = isPrimary
+    ? caseTypeProperties
+    : currentRow?.targetPropertyChilds ?? [];
 
-  const hasPrimary = flows.some((r) => r.type === 'primary');
-  const currentRow = flows.find(r => r.id === activeRow?.id);
-
-  const updateMappingField = (
-    rowId: number,
-    mappingId: number,
-    field: keyof MappingType,
-    value: string
-  ) => {
-    setFlows((prev) =>
-      prev.map((row) =>
+  const updateMappingField = (rowId, mappingId, field, value) => {
+    setFlowData( prev =>
+      prev.map(row =>
         row.id === rowId
           ? {
               ...row,
-              mappings: row.mappings.map((m) =>
+              mappings: row.mappings.map(m =>
                 m.id === mappingId ? { ...m, [field]: value } : m
-              ),
+              )
             }
           : row
       )
@@ -152,7 +186,7 @@ const Mapping = (props: MappingProps) => {
   };
 
   const addCaseTypeMapping = (rowId: number) => {
-    setFlows((prev) =>
+    setFlowData((prev) =>
       prev.map((row) =>
         row.id === rowId
           ? {
@@ -160,8 +194,9 @@ const Mapping = (props: MappingProps) => {
               mappings: [
                 ...row.mappings,
                 {
-                  id: Date.now(),
+                  id: crypto.randomUUID(),
                   targetProperty: '',
+                  targetPropertyChilds: [],
                   sourceTableName: '',
                   sourceProperty: '',
                   joinType: '',
@@ -174,12 +209,12 @@ const Mapping = (props: MappingProps) => {
   };
 
   const deleteMapping = (rowId: number, mappingId: number) => {
-    setFlows((prev) =>
+    setFlowData((prev) =>
       prev.map((row) =>
         row.id === rowId
           ? {
               ...row,
-              mappings: row.mappings.filter((m) => m.id !== mappingId),
+              mappings: row.mappings.filter((m) => m.id !== mappingId)
             }
           : row
       )
@@ -208,12 +243,11 @@ const Mapping = (props: MappingProps) => {
   }
 
   const handleSourceTableChange = async (rowId: number, column: string, value: string) => {
-    await updateRow(rowId, column, value);
+    updateRow(rowId, column, value);
     const res = await fetchTableColumns(value);
     const columns = (res?.data || []).map((c: any) => c.column_name);
-    console.log(columns);
 
-    setFlows(prev =>
+    setFlowData(prev =>
       prev.map(r =>
         r.id === rowId
           ? { ...r, sourceTableColumns: columns }
@@ -222,23 +256,48 @@ const Mapping = (props: MappingProps) => {
     );
   };
 
-  const propertyNodeMap = React.useMemo(() => {
-    const buildNodeMap = (nodes = [], map = {}) => {
+  const propertyNodeMap = useMemo(() => {
+    const buildNodeMap = (
+      nodes: any[] = [],
+      map: Record<string, any> = {}
+    ) => {
       nodes.forEach(node => {
         map[node.pyPropertyName] = node;
-        if (node.ChildProperties) {
-          buildNodeMap(node.ChildProperties, map);
-        }
       });
       return map;
     };
-
     return buildNodeMap(caseTypeProperties);
   }, [caseTypeProperties]);
 
+  const getIncompleteMappings = (mappings: any[]) => {
+    return mappings.filter(m =>
+      !m.sourceProperty ||
+      !m.targetProperty ||
+      m.sourceProperty.trim() === '' ||
+      m.targetProperty.trim() === ''
+    );
+  };
+
+  const incompleteMappings = currentRow
+    ? getIncompleteMappings(currentRow.mappings)
+    : [];
+
+  const hasErrors = incompleteMappings.length > 0;
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSubmitted(true);
+    if (flowformRef.current?.checkValidity()) {
+      onSubmit?.(flowData);
+    } else {
+      console.log('here');
+      flowformRef.current?.reportValidity();
+    }
+  };
+
   return (
     <>
-      {activeStep === 1 && flows.length === 0 && (
+      {activeStep === 1 && flowData.length === 0 && (
         <>
           <EmptyState style={{ marginTop: '12px', marginBottom: '12px' }} />
           <Button compact={true} onClick={addRow}>
@@ -247,237 +306,215 @@ const Mapping = (props: MappingProps) => {
         </>
       )}
 
-      <Form id='database-form' onSubmit={handleSubmit}>
-        <div style={{ marginTop: '16px' }}>
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              marginTop: '12px',
-              marginBottom: '12px',
-            }}
-          >
-            <thead>
-              <tr>
-                <th>Type</th>
-                <th>Source Table</th>
-                <th>Target Property</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {flows.map((row) => (
-                <tr key={row.id}>
-                  <td>
-                    <select value={row.type} onChange={(e) => updateRow(row.id, 'type', e.target.value)} disabled={row.type === 'primary'}>
-                      <option value=''>Select</option>
-                      {sourceTypes.map((t) => (
-                        <option key={t} value={t} disabled={t === 'primary' && row.type !== 'primary' && hasPrimary}>
-                          {t}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-
-                  <td>
-                    <select value={row.sourceTableName} onChange={(e) => handleSourceTableChange(row.id, 'sourceTableName', e.target.value)}>
-                      <option value=''>Select</option>
-                      {tables.map((t) => (
-                        <option key={t.table_name} value={t.table_name}>
-                          {t.table_name}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-
-                  <td>
+      {
+        flowData.length !== 0 &&
+        <Form id='flow-form' ref={flowformRef} onSubmit={handleSubmit}>
+          <div style={{ marginTop: '16px' }}>
+            <Table>
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Source Table</th>
+                  <th>Target Property</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {flowData.map((row) => (
+                  <tr key={row.id}>
+                    <td>
+                    {
+                      row.type === 'primary' &&
+                      <p>Primary</p>
+                    }
                     {
                       row.type !== 'primary' &&
-                      <select value={row.targetProperty} onChange={(e) => updateRow(row.id, 'targetProperty', e.target.value)}>
+                      <select name='flowType' value={row.type} onChange={(e) => updateRow(row.id, 'type', e.target.value)}>
                         <option value=''>Select</option>
-                        {caseTypeProperties.map((t) => (
-                          <option key={t.pyPropertyName} value={t.pyPropertyName}>
-                            { t.pyPropertyName }
+                        {sourceTypes.map((t) => (
+                          <option key={t} value={t} disabled={t === 'primary' && row.type !== 'primary' && hasPrimary}>
+                            {t}
                           </option>
                         ))}
                       </select>
                     }
-                  </td>
+                    </td>
 
-                  <td>
-                    <Button icon onClick={() => openMapPopup(row)}>
-                      <Icon name='eye' />
-                    </Button>
-                    <Button icon style={{ marginLeft: 8 }} onClick={() => deleteRow(row.id)} disabled={row.type === 'primary'}>
-                      <Icon name='trash' />
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    <td>
+                      <select name='flowSourceTable' required value={row.sourceTableName} onChange={(e) => handleSourceTableChange(row.id, 'sourceTableName', e.target.value)}>
+                        <option value=''>Select</option>
+                        {tables.map((t) => (
+                          <option key={t.table_name} value={t.table_name}>
+                            {t.table_name}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
 
-          { /* caseType & primary starts */ }
-          { showPopup &&
-           currentRow &&
-           selectedMigrationType === 'caseType' &&
-           currentRow.type === 'primary' && (
-
-            <div
-              style={{
-                position: 'fixed',
-                inset: 0,
-                background: 'rgba(0,0,0,0.4)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: '9999'
-              }}
-            >
-              <div
-                style={{
-                  background: '#fff',
-                  padding: 20,
-                  width: 800,
-                  borderRadius: 8,
-                }}
-              >
-                <h4>Source Mapping</h4>
-
-                <table
-                  style={{
-                    width: '100%',
-                    borderCollapse: 'collapse',
-                    marginTop: '12px',
-                    marginBottom: '12px',
-                  }}
-                >
-                  <thead>
-                    <tr>
-                      <th>Target Property</th>
-                      <th>Source Table Name</th>
-                      <th>Source Property</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {
-                      currentRow.mappings.map((mapping) => (
-                      <tr key={mapping.id}>
-                        <td>
-                          <select value={mapping.targetProperty} onChange={(e) => updateMappingField(currentRow.id, mapping.id, 'targetProperty', e.target.value)}>
-                            <option value=''>Select</option>
-                            { mockFields.map((t) => (
-                              <option key={t} value={t}>
-                                {t}
-                              </option>
-                            ))}
-                          </select>
-                        </td>
-
-                        <td>
-                          {
-                            <input value={currentRow.sourceTableName} disabled />
+                    <td>
+                      {row.type !== 'primary' && (
+                        <select
+                          name='flowtargetProperty'
+                          required
+                          value={row.targetProperty}
+                          onChange={(e) =>
+                            updateRowWithChild(
+                              row.id,
+                              'targetProperty',
+                              e.target.value
+                            )
                           }
-                        </td>
+                        >
+                          <option value="">Select</option>
+                          {caseTypeProperties.map((t) => (
+                            <option key={t.pyPropertyName} value={t.pyPropertyName}>
+                              { t.pyPropertyName }
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </td>
 
-                        <td>
-                          <select value={mapping.sourceProperty} onChange={(e) => updateMappingField(currentRow.id, mapping.id, 'sourceProperty', e.target.value)}>
-                            <option value=''>Select</option>
-                            { currentRow.sourceTableColumns.map((t) => (
-                              <option key={t} value={t}>
-                                {t}
-                              </option>
+                    <td>
+                      <Button icon onClick={() => openMapPopup(row)}>
+                        <Icon name='eye' />
+                      </Button>
+                      <Button icon style={{ marginLeft: 8 }} onClick={() => deleteRow(row.id)} disabled={row.type === 'primary'}>
+                        <Icon name='trash' />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+
+            { /* popup */ }
+
+              { showPopup && currentRow && selectedMigrationType === 'caseType' && (
+                <Popup>
+                  <PopupInner>
+                    <h4 style={{ marginTop: 12, marginBottom: 12 }}>
+                      Source Mapping
+                    </h4>
+
+                    { currentRow.mappings.length === 0 ? (
+                      <>
+                        <EmptyState style={{ marginTop: 12, marginBottom: 12 }} />
+                        <Button variant="primary" onClick={() => addCaseTypeMapping(currentRow.id)}>
+                          Add Mapping
+                        </Button>
+                        <Button variant="secondary" onClick={closePopup}>
+                          Close
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Table>
+                          <thead>
+                            <tr>
+                              <th>Source Table Name</th>
+                              <th>Source Property</th>
+                              <th>Target Property</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+
+                          <tbody>
+                            {currentRow.mappings.map(mapping => (
+                              <tr key={mapping.id}>
+                                <td>
+                                  <input value={currentRow.sourceTableName} disabled />
+                                </td>
+
+                                <td>
+                                  <select
+                                    className={!mapping.sourceProperty ? 'invalid' : ''}
+                                    value={mapping.sourceProperty}
+                                    onChange={e =>
+                                      updateMappingField(
+                                        currentRow.id,
+                                        mapping.id,
+                                        'sourceProperty',
+                                        e.target.value
+                                      )
+                                    }
+                                  >
+                                    <option value="">Select</option>
+                                    {currentRow.sourceTableColumns.map(t => (
+                                      <option key={t} value={t}>
+                                        {t}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </td>
+
+                                <td>
+                                  <select
+                                    className={!mapping.targetProperty ? 'invalid' : ''}
+                                    value={mapping.targetProperty}
+                                    onChange={e =>
+                                      updateMappingField(
+                                        currentRow.id,
+                                        mapping.id,
+                                        'targetProperty',
+                                        e.target.value
+                                      )
+                                    }
+                                  >
+                                    <option value="">Select</option>
+                                    {targetOptions.map(t => (
+                                      <option key={t.pyPropertyName} value={t.pyPropertyName}>
+                                        {t.pyPropertyName}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </td>
+
+                                <td>
+                                  <Button
+                                    icon
+                                    style={{ marginLeft: 8 }}
+                                    onClick={() => deleteMapping(currentRow.id, mapping.id)}
+                                  >
+                                    <Icon name="trash" />
+                                  </Button>
+                                </td>
+                              </tr>
                             ))}
-                          </select>
-                        </td>
+                          </tbody>
+                        </Table>
 
-                        <td>
-                          <Button icon style={{ marginLeft: 8 }} onClick={() => deleteMapping(currentRow.id, mapping.id)}>
-                            <Icon name='trash' />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        {hasErrors && (
+                          <div className="popup-error">
+                            Please complete all mapping rows before closing. Fields marked in red are required. Remove rows which are not required.
+                          </div>
+                        )}
 
-                <Button
-                  primary
-                  compact
-                  onClick={() => addCaseTypeMapping(currentRow.id)}
-                >
-                  Add Mapping
-                </Button>
+                        <br />
+                        <Button variant="primary" onClick={() => addCaseTypeMapping(currentRow.id)}>
+                          Add Mapping
+                        </Button>
 
-                <Button
-                  primary
-                  compact
-                  onClick={() => test()}
-                >
-                  Show Json
-                </Button>
+                        <Button variant="secondary" onClick={closePopup} disabled={hasErrors}>
+                          Close
+                        </Button>
+                      </>
+                    )}
+                  </PopupInner>
+                </Popup>
+              )}
+            { /* popup end */ }
 
+            <br />
+            <Button variant="primary" onClick={addRow}>
+              Add Flow
+            </Button>
+            <Button onClick={setBack}> Back </Button>
+            <Button type='submit'>Next</Button>
+          </div>
+        </Form>
+      }
 
-                <Button compact={true} onClick={closePopup}>
-                  Close
-                </Button>
-
-                {showJson && (
-                  <pre>{JSON.stringify(flows, null, 2)}</pre>
-                )}
-
-              </div>
-            </div>
-          )}
-          { /* caseType & primary end */ }
-
-
-
-          { showJson === true && (
-
-            <div
-              style={{
-                position: 'fixed',
-                inset: 0,
-                background: 'rgba(0,0,0,0.4)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: '9999'
-              }}
-            >
-              <div
-                style={{
-                  background: '#fff',
-                  padding: 20,
-                  width: 800,
-                  borderRadius: 8,
-                }}
-              >
-                <p>
-                  <pre>{JSON.stringify(flows, null, 2)}</pre>
-                </p>
-
-                <Button onClick={() => setshowJson(false)} >
-                  Hide
-                </Button>
-
-              </div>
-            </div>
-          )}
-
-
-          <Button compact={true} onClick={addRow}>
-            Add Flow
-          </Button>
-
-          <br/>
-
-          <Button type='submit'>Next</Button>
-          <Button onClick={logJson}>log json</Button>
-        </div>
-      </Form>
     </>
   );
 };

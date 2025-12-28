@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { withConfiguration } from '@pega/cosmos-react-core';
+import { Button } from '@pega/cosmos-react-core';
 import Database from './Database';
 import Mapping from './Mapping';
 import Stepper from './Stepper';
@@ -36,13 +37,35 @@ interface DashboardProps extends PConnFieldProps {
   dataTypesDataPage: string;
 }
 
+//flow
+type RowType = {
+  id: number;
+  type: string;
+  targetProperty: string;
+  targetPropertyChilds: Record<string, any>[];
+  sourceTableName: string;
+  sourceTableColumns: string[];
+  mappings: Record<string, any>[];
+};
+
 function DataMigAccelComponent(props: DashboardProps) {
   const { getPConnect, value, dataBaseDataPage, caseTypesDataPage, tableNamesDataPage, tableDetailsDataPage, caseTypesPropsDataPage, schemaNamesDataPage, dataTypesDataPage } = props;
 
   const PConnect = getPConnect();
   const context = PConnect.getContextName();
+  const [flowData, setFlowData] = useState<RowType[]>([]);
 
-  console.log(context, value);
+  useEffect(() => {
+    setFlowData([{
+      id: Date.now(),
+      type: 'primary',
+      targetProperty: '',
+      targetPropertyChilds: [],
+      sourceTableName: '',
+      sourceTableColumns: [],
+      mappings: []
+    }]);
+  }, []);
 
   const steps = ['DB', 'Map Fields', 'Review'];
   const migrationTypes = [
@@ -75,7 +98,7 @@ function DataMigAccelComponent(props: DashboardProps) {
   const [selectedCaseType, setselectedCaseType] = useState('');
 
   useEffect(() => {
-    setSourceTypes(['primary', 'page', 'page list']);
+    setSourceTypes(['page', 'page list']);
     setjoinCriteria(['inner', 'left']);
 
     setSelectedDatabase('CustomerData');
@@ -85,7 +108,7 @@ function DataMigAccelComponent(props: DashboardProps) {
 
   },[]);
 
-  // Load data pages
+  // loading data pages
   useEffect(() => {
     async function loadData() {
       try {
@@ -191,7 +214,7 @@ function DataMigAccelComponent(props: DashboardProps) {
           return result;
         });
 
-        setCaseTypeProperties();
+        setCaseTypeProperties(cleaned);
       } catch (err) {
         console.error('Error loading schema names:', err);
         setCaseTypeProperties([]);
@@ -201,8 +224,18 @@ function DataMigAccelComponent(props: DashboardProps) {
   }, [caseTypesPropsDataPage, selectedCaseType, context]);
 
 
+  const setBack = () => {
+    setActiveStep((prev) => prev - 1);
+  }
+
   const submit = () => {
     setActiveStep((prev) => prev + 1);
+  };
+
+  const mappingSubmit = (flows) => {
+    console.log('in index');
+    setActiveStep((prev) => prev + 1);
+    setFlowData(flows);
   };
 
   // const handleFinalSubmit = () => {
@@ -217,7 +250,7 @@ function DataMigAccelComponent(props: DashboardProps) {
         <div>
           {<Stepper steps={steps} activeStep={activeStep} setActiveStep={setActiveStep} />}
 
-          {activeStep === 0 && (
+          { activeStep === 0 && (
             <>
               <div style={{ width: '80%', marginTop: '20px' }}>
                 <Database
@@ -245,7 +278,7 @@ function DataMigAccelComponent(props: DashboardProps) {
             </>
           )}
 
-          {activeStep === 1 && (
+          { activeStep === 1 && (
             <>
               <Mapping
                 context={context}
@@ -255,14 +288,28 @@ function DataMigAccelComponent(props: DashboardProps) {
                 sourceTypes={sourceTypes}
                 joinCriteria={joinCriteria}
                 tables={tables}
-
                 schemaName={schemaName}
                 selectedDatabase={selectedDatabase}
-
                 caseTypeProperties={caseTypeProperties}
+
+                flowData={flowData}
+                setFlowData={setFlowData}
+                onSubmit={mappingSubmit}
+                setBack={setBack}
               />
             </>
           )}
+
+          { activeStep === 2 && (
+            <>
+              <div className="json-box">
+                <pre>{JSON.stringify(flowData, null, 2)}</pre>
+              </div>
+              <Button onClick={setBack}> Back </Button>
+              <Button variant="primary"> Submit </Button>
+            </>
+          )}
+
         </div>
       </div>
     </DashboardWrapper>

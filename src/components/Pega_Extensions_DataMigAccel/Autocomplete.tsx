@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import type { ChangeEvent, FC } from 'react';
-// import './Autocomplete.css';
 
 interface AutocompleteProps {
   disabled?: boolean;

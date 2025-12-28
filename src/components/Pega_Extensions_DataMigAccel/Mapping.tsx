@@ -101,6 +101,7 @@ const Mapping = (props: MappingProps) => {
 
   useEffect(() => {
     console.log('flowData after render:', flowData);
+    console.log(MappingType);    
   }, [flowData]);
 
   const addRow = () => {

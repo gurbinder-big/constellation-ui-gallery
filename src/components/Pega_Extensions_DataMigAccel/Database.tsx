@@ -51,6 +51,8 @@ type DatabaseProps = {
   schemaName: string;
   setschemaName: (value: string) => void;
   selectedCaseType: string;
+  primarySourceKey: string;
+  primarySourceTable: string;
   setselectedCaseType: (value: string) => void;
   onSubmit?: () => void;
 };
@@ -74,6 +76,11 @@ const Database = (props: DatabaseProps) => {
 
     selectedCaseType,
     setselectedCaseType,
+
+    primarySourceKey,
+    primarySourceTable,
+
+
     onSubmit,
   } = props;
 

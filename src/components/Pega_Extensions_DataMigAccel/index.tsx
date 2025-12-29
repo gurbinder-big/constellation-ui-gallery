@@ -106,15 +106,21 @@ function DataMigAccelComponent(props: DashboardProps) {
   const [schemaName, setschemaName] = useState('');
   const [selectedCaseType, setselectedCaseType] = useState('');
 
+  const [primarySourceTable, setPrimarySourceTable] = useState('');
+  const [primarySourceKey, setPrimarySourceKey] = useState('');
+
   useEffect(() => {
     setSourceTypes(['page', 'page list']);
     setjoinCriteria(['inner', 'left']);
 
     // for testing
-    // setSelectedDatabase('CustomerData');
-    // setselectedMigrationType('caseType');
-    // setschemaName('dummy');
-    // setselectedCaseType('BIG-GDM-Work-DataMigration');
+    setPrimarySourceTable('employees');
+    setPrimarySourceKey('id');
+
+    setSelectedDatabase('CustomerData');
+    setselectedMigrationType('caseType');
+    setschemaName('dummy');
+    setselectedCaseType('BIG-GDM-Work-DataMigration');
   },[]);
 
   // loading data pages
@@ -283,6 +289,9 @@ function DataMigAccelComponent(props: DashboardProps) {
 
                   selectedMigrationType={selectedMigrationType}
                   setselectedMigrationType={setselectedMigrationType}
+
+                  primarySourceKey={primarySourceKey}
+                  primarySourceTable={primarySourceTable}
 
                   onSubmit={submit}
                 />

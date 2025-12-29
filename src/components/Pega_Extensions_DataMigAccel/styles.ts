@@ -20,6 +20,10 @@ const GlobalStyle = createGlobalStyle`
       word-break: break-word;
     }
 
+    .pega-button-variant-primary {
+      color: #fff;
+    }
+
     select.invalid {
       border-color: #b83838;
     }

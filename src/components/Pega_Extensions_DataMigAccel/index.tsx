@@ -37,19 +37,28 @@ interface DashboardProps extends PConnFieldProps {
   dataTypesDataPage: string;
 }
 
+//mapping
+type MappingType = {
+  id: string;
+  targetProperty: string;
+  sourceTableName: string;
+  sourceProperty: string;
+  joinType: string;
+};
+
 //flow
 type RowType = {
-  id: number;
+  id: string;
   type: string;
   targetProperty: string;
   targetPropertyChilds: Record<string, any>[];
   sourceTableName: string;
   sourceTableColumns: string[];
-  mappings: Record<string, any>[];
+  mappings: MappingType[];
 };
 
 function DataMigAccelComponent(props: DashboardProps) {
-  const { getPConnect, value, dataBaseDataPage, caseTypesDataPage, tableNamesDataPage, tableDetailsDataPage, caseTypesPropsDataPage, schemaNamesDataPage, dataTypesDataPage } = props;
+  const { getPConnect, dataBaseDataPage, caseTypesDataPage, tableNamesDataPage, tableDetailsDataPage, caseTypesPropsDataPage, schemaNamesDataPage, dataTypesDataPage } = props;
 
   const PConnect = getPConnect();
   const context = PConnect.getContextName();
@@ -57,7 +66,7 @@ function DataMigAccelComponent(props: DashboardProps) {
 
   useEffect(() => {
     setFlowData([{
-      id: Date.now(),
+      id: crypto.randomUUID(),
       type: 'primary',
       targetProperty: '',
       targetPropertyChilds: [],
@@ -101,11 +110,11 @@ function DataMigAccelComponent(props: DashboardProps) {
     setSourceTypes(['page', 'page list']);
     setjoinCriteria(['inner', 'left']);
 
-    setSelectedDatabase('CustomerData');
-    setselectedMigrationType('caseType');
-    setschemaName('dummy');
-    setselectedCaseType('BIG-GDM-Work-DataMigration');
-
+    // for testing
+    // setSelectedDatabase('CustomerData');
+    // setselectedMigrationType('caseType');
+    // setschemaName('dummy');
+    // setselectedCaseType('BIG-GDM-Work-DataMigration');
   },[]);
 
   // loading data pages
@@ -200,13 +209,16 @@ function DataMigAccelComponent(props: DashboardProps) {
             CaseType: selectedCaseType,
           }
         });
-        const cleaned = res?.data.map(item => {
-          const result = {
+        const cleaned = (res?.data ?? []).map(item => {
+          const result: {
+            pyPropertyName: string;
+            ChildProperties?: { pyPropertyName: string }[];
+          } = {
             pyPropertyName: item.pyPropertyName
           };
 
           if (Array.isArray(item.ChildProperties)) {
-            result.ChildProperties = item.ChildProperties.map(child => ({
+            result.ChildProperties = item.ChildProperties.map((child : any) => ({
               pyPropertyName: child.pyPropertyName
             }));
           }
@@ -232,7 +244,7 @@ function DataMigAccelComponent(props: DashboardProps) {
     setActiveStep((prev) => prev + 1);
   };
 
-  const mappingSubmit = (flows) => {
+  const mappingSubmit = (flows: RowType[]) => {
     console.log('in index');
     setActiveStep((prev) => prev + 1);
     setFlowData(flows);

@@ -1,8 +1,12 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import styled from 'styled-components';
-import { Button, EmptyState, Icon } from '@pega/cosmos-react-core';
-import Autocomplete from './Autocomplete';
+import { Button, EmptyState, Icon, registerIcon } from '@pega/cosmos-react-core';
 import { fetchListDataPage } from './apiUtils';
+
+import * as eyeIcon from '@pega/cosmos-react-core/lib/components/Icon/icons/eye.icon';
+import * as trashIcon from '@pega/cosmos-react-core/lib/components/Icon/icons/trash.icon';
+
+registerIcon(trashIcon, eyeIcon);
 
 const Form = styled.form`
   width: 100%;
@@ -26,12 +30,31 @@ const PopupInner = styled.div`
 `;
 
 const Table = styled.table`
-  width: '100%',
-  border-collapse: 'collapse',
-  margin-top: '12px',
-  margin-bottom: '12px',
+  width: '100%';
+  border-collapse: 'collapse';
+  margin-top: '12px';
+  margin-bottom: '12px';
 `;
 
+//mapping
+type MappingType = {
+  id: string;
+  targetProperty: string;
+  sourceTableName: string;
+  sourceProperty: string;
+  joinType: string;
+};
+
+//flow
+type RowType = {
+  id: string;
+  type: string;
+  targetProperty: string;
+  targetPropertyChilds: Record<string, any>[];
+  sourceTableName: string;
+  sourceTableColumns: string[];
+  mappings: MappingType[];
+};
 
 // component
 type MappingProps = {
@@ -47,28 +70,9 @@ type MappingProps = {
   joinCriteria: string[];
   onSubmit?: (data: RowType[]) => void;
   flowData: RowType[];
-  setFlowData: (data: RowType[]) => void;
+  // setFlowData: (data: RowType[]) => void;
+  setFlowData: (data: RowType[] | ((prev: RowType[]) => RowType[])) => void;
   setBack?: () => void;
-};
-
-//flow
-type RowType = {
-  id: number;
-  type: string;
-  targetProperty: string;
-  targetPropertyChilds: Record<string, any>[];
-  sourceTableName: string;
-  sourceTableColumns: string[];
-  mappings: Record<string, any>[];
-};
-
-//mapping
-type MappingType = {
-  id: number;
-  targetProperty: string;
-  sourceTableName: string;
-  sourceProperty: string;
-  joinType: string;
 };
 
 
@@ -83,7 +87,6 @@ const Mapping = (props: MappingProps) => {
     selectedMigrationType,
     caseTypeProperties,
     sourceTypes,
-    joinCriteria,
     onSubmit,
     flowData,
     setFlowData,
@@ -91,8 +94,8 @@ const Mapping = (props: MappingProps) => {
   } = props;
 
 
-  const [showJson, setshowJson] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  // const [showJson, setshowJson] = useState(false);
+  // const [submitted, setSubmitted] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [activeRow, setActiveRow] = useState<RowType | null>(null);
 
@@ -101,7 +104,6 @@ const Mapping = (props: MappingProps) => {
 
   useEffect(() => {
     console.log('flowData after render:', flowData);
-    console.log(MappingType);    
   }, [flowData]);
 
   const addRow = () => {
@@ -119,10 +121,10 @@ const Mapping = (props: MappingProps) => {
     ]);
   };
 
-  const updateRowWithChild = (id: number, key: string, value: string) => {
+  const updateRowWithChild = (id: string, key: string, value: string) => {
     const childProps = propertyNodeMap[value]?.ChildProperties ?? [];
-    setFlowData(prev => {
-      const updated = prev.map(r =>
+    setFlowData((prev: RowType[]) => {
+      const updated = prev.map((r: RowType) =>
         r.id === id
           ? {
               ...r,
@@ -139,13 +141,13 @@ const Mapping = (props: MappingProps) => {
   //   setFlowData((prev) => prev.map((r) => (r.id === id ? { ...r, [key]: value } : r)));
   // };
 
-  const updateRow = (id: number, key: string, value: string) => {
-    setFlowData( prev =>
-      prev.map(r => r.id === id ? { ...r, [key]: value } : r)
+  const updateRow = (id: string, key: string, value: string) => {
+    setFlowData( (prev : RowType[]) =>
+      prev.map((r : RowType) => r.id === id ? { ...r, [key]: value } : r)
     );
   };
 
-  const deleteRow = (id: number) => {
+  const deleteRow = (id: string) => {
     setFlowData(flowData.filter(r => !(r.id === id && r.type !== 'primary')));
   };
 
@@ -171,13 +173,13 @@ const Mapping = (props: MappingProps) => {
     ? caseTypeProperties
     : currentRow?.targetPropertyChilds ?? [];
 
-  const updateMappingField = (rowId, mappingId, field, value) => {
-    setFlowData( prev =>
-      prev.map(row =>
+  const updateMappingField = (rowId : string, mappingId : string, field : string, value : string) => {
+    setFlowData( (prev : RowType[]) =>
+      prev.map((row: RowType) =>
         row.id === rowId
           ? {
               ...row,
-              mappings: row.mappings.map(m =>
+              mappings: row.mappings.map((m: MappingType) =>
                 m.id === mappingId ? { ...m, [field]: value } : m
               )
             }
@@ -186,9 +188,9 @@ const Mapping = (props: MappingProps) => {
     );
   };
 
-  const addCaseTypeMapping = (rowId: number) => {
-    setFlowData((prev) =>
-      prev.map((row) =>
+  const addCaseTypeMapping = (rowId: string) => {
+    setFlowData((prev: RowType[]) =>
+      prev.map((row : RowType) =>
         row.id === rowId
           ? {
               ...row,
@@ -197,7 +199,6 @@ const Mapping = (props: MappingProps) => {
                 {
                   id: crypto.randomUUID(),
                   targetProperty: '',
-                  targetPropertyChilds: [],
                   sourceTableName: '',
                   sourceProperty: '',
                   joinType: '',
@@ -209,9 +210,9 @@ const Mapping = (props: MappingProps) => {
     );
   };
 
-  const deleteMapping = (rowId: number, mappingId: number) => {
-    setFlowData((prev) =>
-      prev.map((row) =>
+  const deleteMapping = (rowId: string, mappingId: string) => {
+    setFlowData((prev : RowType[]) =>
+      prev.map((row : RowType) =>
         row.id === rowId
           ? {
               ...row,
@@ -223,13 +224,13 @@ const Mapping = (props: MappingProps) => {
   };
 
 
-  const logJson = () => {
-    setshowJson((prev) => !prev);
-  }
-
-  const test = () => {
-    setshowJson((prev) => !prev);
-  }
+  // const logJson = () => {
+  //   setshowJson((prev) => !prev);
+  // }
+  //
+  // const test = () => {
+  //   setshowJson((prev) => !prev);
+  // }
 
   const fetchTableColumns = async (table: any) => {
     const res = await fetchListDataPage(tableDetailsDataPage, context, {
@@ -243,13 +244,13 @@ const Mapping = (props: MappingProps) => {
     return res;
   }
 
-  const handleSourceTableChange = async (rowId: number, column: string, value: string) => {
+  const handleSourceTableChange = async (rowId: string, column: string, value: string) => {
     updateRow(rowId, column, value);
     const res = await fetchTableColumns(value);
     const columns = (res?.data || []).map((c: any) => c.column_name);
 
-    setFlowData(prev =>
-      prev.map(r =>
+    setFlowData((prev : RowType[]) =>
+      prev.map((r : RowType) =>
         r.id === rowId
           ? { ...r, sourceTableColumns: columns }
           : r
@@ -287,7 +288,7 @@ const Mapping = (props: MappingProps) => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitted(true);
+    // setSubmitted(true);
     if (flowformRef.current?.checkValidity()) {
       onSubmit?.(flowData);
     } else {
@@ -367,7 +368,7 @@ const Mapping = (props: MappingProps) => {
                           }
                         >
                           <option value="">Select</option>
-                          {caseTypeProperties.map((t) => (
+                          {caseTypeProperties.map((t: any) => (
                             <option key={t.pyPropertyName} value={t.pyPropertyName}>
                               { t.pyPropertyName }
                             </option>
@@ -377,8 +378,8 @@ const Mapping = (props: MappingProps) => {
                     </td>
 
                     <td>
-                      <Button icon onClick={() => openMapPopup(row)}>
-                        <Icon name='eye' />
+                      <Button onClick={() => openMapPopup(row)}>
+                        Mappings
                       </Button>
                       <Button icon style={{ marginLeft: 8 }} onClick={() => deleteRow(row.id)} disabled={row.type === 'primary'}>
                         <Icon name='trash' />
@@ -421,7 +422,7 @@ const Mapping = (props: MappingProps) => {
                           </thead>
 
                           <tbody>
-                            {currentRow.mappings.map(mapping => (
+                            { currentRow.mappings.map((mapping : MappingType) => (
                               <tr key={mapping.id}>
                                 <td>
                                   <input value={currentRow.sourceTableName} disabled />
@@ -463,7 +464,7 @@ const Mapping = (props: MappingProps) => {
                                     }
                                   >
                                     <option value="">Select</option>
-                                    {targetOptions.map(t => (
+                                    {targetOptions.map((t : any) => (
                                       <option key={t.pyPropertyName} value={t.pyPropertyName}>
                                         {t.pyPropertyName}
                                       </option>

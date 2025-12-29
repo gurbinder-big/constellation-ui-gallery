@@ -36,10 +36,10 @@ const mockData = {
     data : {
       data: [
         {
-          "table_name": "address_tbl"
+          "table_name": "employee"
         },
         {
-          "table_name": "categories_tbl"
+          "table_name": "employee_address"
         }
       ]
     }

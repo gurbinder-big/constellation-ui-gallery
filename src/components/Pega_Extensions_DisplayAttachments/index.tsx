@@ -21,7 +21,7 @@ import {
 import type { SummaryListItem, ModalMethods, ModalProps, LightboxItem, LightboxProps } from '@pega/cosmos-react-core';
 import { downloadBlob, addAttachment, downloadFile } from './utils';
 import StyledCardContent from './styles';
-import '../create-nonce';
+import '../shared/create-nonce';
 
 import * as polarisIcon from '@pega/cosmos-react-core/lib/components/Icon/icons/polaris.icon';
 import * as informationIcon from '@pega/cosmos-react-core/lib/components/Icon/icons/information.icon';
@@ -65,7 +65,7 @@ export type UtilityListProps = {
   useAttachmentEndpoint: boolean;
   categories?: string;
   dataPage: string;
-  icon?: 'information' | 'polaris' | 'clipboard';
+  iconName?: 'information' | 'polaris' | 'clipboard';
   displayFormat?: 'list' | 'tiles';
   useLightBox?: boolean;
   enableDownloadAll?: boolean;
@@ -95,7 +95,7 @@ export const PegaExtensionsDisplayAttachments = (props: UtilityListProps) => {
     dataPage = '',
     categories = '',
     displayFormat = 'summaryList',
-    icon = 'clipboard',
+    iconName = 'clipboard',
     useLightBox = false,
     enableDownloadAll = false,
     getPConnect,
@@ -106,10 +106,9 @@ export const PegaExtensionsDisplayAttachments = (props: UtilityListProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [elemRef, setElemRef] = useState<HTMLElement>();
   const [images, setImages] = useState<LightboxProps['items'] | null>(null);
-
+  const caseID = getPConnect().getValue((window as any).PCore.getConstants().CASE_INFO.CASE_INFO_ID);
   const viewAllModalRef = useRef<ModalMethods<any>>();
   const theme = useTheme();
-
   const downloadAll = () => {
     files?.forEach((attachment: any) => {
       downloadFile(attachment, getPConnect, undefined, true);
@@ -128,6 +127,17 @@ export const PegaExtensionsDisplayAttachments = (props: UtilityListProps) => {
       }
     });
   };
+
+  const publishAttachmentsUpdated = useCallback(
+    (count: any) => {
+      (window as any).PCore.getPubSubUtils().publish('WidgetUpdated', {
+        widget: 'PEGA_EXTENSIONS_DISPLAYATTACHMENTS',
+        count,
+        caseID,
+      });
+    },
+    [caseID],
+  );
 
   const loadAttachments = useCallback(
     (response: Array<any> = []) => {
@@ -183,16 +193,16 @@ export const PegaExtensionsDisplayAttachments = (props: UtilityListProps) => {
       });
       setFiles(listOfFiles);
       setAttachments(listOfAttachments);
+      publishAttachmentsUpdated(listOfAttachments?.length ?? 0);
       setLoading(false);
     },
-    [categories, getPConnect, useAttachmentEndpoint, useLightBox],
+    [categories, getPConnect, useAttachmentEndpoint, useLightBox, publishAttachmentsUpdated],
   );
 
   const initialLoad = useCallback(() => {
     const pConn = getPConnect();
     if (useAttachmentEndpoint) {
       const attachmentUtils = (window as any).PCore.getAttachmentUtils();
-      const caseID = pConn.getValue((window as any).PCore.getConstants().CASE_INFO.CASE_INFO_ID);
       attachmentUtils
         .getCaseAttachments(caseID, pConn.getContextName())
         .then((resp: any) => loadAttachments(resp))
@@ -217,11 +227,10 @@ export const PegaExtensionsDisplayAttachments = (props: UtilityListProps) => {
           setLoading(false);
         });
     }
-  }, [dataPage, getPConnect, loadAttachments, useAttachmentEndpoint]);
+  }, [dataPage, getPConnect, loadAttachments, useAttachmentEndpoint, caseID]);
 
   /* Subscribe to changes to the assignment case */
   useEffect(() => {
-    const caseID = getPConnect().getValue((window as any).PCore.getConstants().CASE_INFO.CASE_INFO_ID);
     const filter = {
       matcher: 'ATTACHMENTS',
       criteria: {
@@ -252,7 +261,7 @@ export const PegaExtensionsDisplayAttachments = (props: UtilityListProps) => {
           <SummaryList
             name={heading}
             headingTag='h3'
-            icon={icon}
+            icon={iconName}
             count={loading ? undefined : attachments.length}
             items={attachments?.slice(0, 3)}
             loading={loading}

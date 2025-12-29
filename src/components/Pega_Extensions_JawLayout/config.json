@@ -1,0 +1,45 @@
+{
+    "name": "Pega_Extensions_JawLayout",
+    "label": "Jaw Layout",
+    "description": "Jaw Layout",
+    "organization": "Pega",
+    "version": "4.0.1",
+    "library": "Extensions",
+    "allowedApplications": [],
+    "componentKey": "Pega_Extensions_JawLayout",
+    "type": "Template",
+    "subtype": "FORM",
+    "properties": [
+        {
+            "name": "heading",
+            "label": "Heading",
+            "format": "TEXT",
+            "defaultValue": "Dental Chart",
+            "required": true
+        },
+        {
+            "name": "A",
+            "label": "Region A",
+            "format": "CONTENTPICKER",
+            "addTypeList": [
+                "Fields"
+            ],
+            "allowCreatingGroup": false
+        },
+        {
+            "format": "LABEL",
+            "label": "About",
+            "name": "PegaAboutLabel",
+            "variant": "h3"
+        },
+        {
+            "format": "LABEL",
+            "label": "Pega_Extensions 4.0.1, Mon Nov 17 2025, 26.1.0-dev-15386",
+            "name": "PegaAboutData",
+            "variant": "primary"
+        }
+    ],
+    "buildDate": "2025-11-17T16:53:10.049Z",
+    "infinityVersion": "26.1.0-dev-15386",
+    "packageCosmosVersion": "8.8.0"
+}

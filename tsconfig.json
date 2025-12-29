@@ -1,13 +1,24 @@
 {
   "extends": "@pega/tsconfig/index.json",
   "include": ["./**/*", ".storybook/**/*"],
-  "exclude": ["**/*.mjs", "dist", "lib"],
+  "exclude": [
+    "**/*.mjs",
+    "dist",
+    "**/*.test.tsx",
+    "node_modules",
+    "lib",
+    "storybook-static",
+    "Pega_Extensions",
+    "store"
+  ],
   "compilerOptions": {
     "noEmit": true,
     "allowJs": true,
     "importsNotUsedAsValues": "remove",
     "skipLibCheck": true,
     "baseUrl": "./",
+    "moduleResolution": "bundler",
+    "module": "ESNext",
     "paths": {
       "@pega/pcore-pconnect-typedefs/*": ["node_modules/@pega/pcore-pconnect-typedefs/*"]
     }

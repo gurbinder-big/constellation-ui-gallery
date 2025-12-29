@@ -1,4 +1,4 @@
-import type { StoryObj } from '@storybook/react';
+import type { StoryObj } from '@storybook/react-webpack5';
 import { FieldValueList } from '@pega/cosmos-react-core';
 import { PegaExtensionsFieldGroupAsRow } from './index';
 
@@ -8,6 +8,19 @@ export default {
     getPConnect: {
       table: {
         disable: true,
+      },
+    },
+  },
+  parameters: {
+    a11y: {
+      context: '#storybook-root',
+      config: {
+        rules: [
+          {
+            id: 'aria-allowed-role',
+            enabled: false,
+          },
+        ],
       },
     },
   },

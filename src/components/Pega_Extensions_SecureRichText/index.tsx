@@ -8,7 +8,7 @@ import { NoValue, registerIcon, useLiveLog, withConfiguration } from '@pega/cosm
 import * as listIcon from '@pega/cosmos-react-core/lib/components/Icon/icons/list.icon';
 import * as listNumberIcon from '@pega/cosmos-react-core/lib/components/Icon/icons/list-number.icon';
 
-import '../create-nonce';
+import '../shared/create-nonce';
 
 registerIcon(listIcon, listNumberIcon);
 
@@ -79,10 +79,9 @@ export const PegaExtensionsSecureRichText = (props: RichTextProps) => {
 
   const pConn = getPConnect();
   const editorRef = useRef<EditorState>(null);
-  const sanitizedValue = useRef(value);
+  const [sanitizedValue, setSanitizedValue] = useState(value);
   const [wordCount, setWordCount] = useState(0);
-  /* current timestamp to track last update */
-  const [lastUpdated, setLastUpdate] = useState(Date.now());
+  const [lastUpdated, setLastUpdate] = useState<number>(0);
   const [announcement, setAnnouncement] = useState<WordCountAnnouncement>({
     message: '',
     isAlert: false,
@@ -161,8 +160,9 @@ export const PegaExtensionsSecureRichText = (props: RichTextProps) => {
   };
 
   const sanitizeContent = (editorContent: string) => {
-    sanitizedValue.current = purify(editorContent);
-    editorRef.current?.insertHtml(sanitizedValue.current, true);
+    const sanitized = purify(editorContent);
+    setSanitizedValue(sanitized);
+    editorRef.current?.insertHtml(sanitized, true);
   };
 
   const updateWordCount = () => {
@@ -203,10 +203,11 @@ export const PegaExtensionsSecureRichText = (props: RichTextProps) => {
 
   useEffect(() => {
     sanitizeContent(value);
+    const now = Date.now();
+    setLastUpdate(now);
     setTimeout(() => {
       updateWordCount();
     }, 1000);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onInit = (editor: TinymceEditor) => {
@@ -215,11 +216,7 @@ export const PegaExtensionsSecureRichText = (props: RichTextProps) => {
     });
   };
 
-  const displayComponent = sanitizedValue ? (
-    <RichTextViewer content={sanitizedValue.current} type='html' />
-  ) : (
-    <NoValue />
-  );
+  const displayComponent = sanitizedValue ? <RichTextViewer content={sanitizedValue} type='html' /> : <NoValue />;
 
   if (displayMode === 'DISPLAY_ONLY') {
     return displayComponent;

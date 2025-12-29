@@ -1,4 +1,4 @@
-import type { StoryObj } from '@storybook/react';
+import type { StoryObj } from '@storybook/react-webpack5';
 import { PegaExtensionsCaseReference } from './index';
 
 export default {
@@ -71,5 +71,8 @@ export const Default: Story = {
   },
   args: {
     value: 'C-123',
+    selectionProperty: 'WORK-ITEM C-123',
+    allowPreview: true,
+    refCaseClassName: 'PegaSample-Task',
   },
 };

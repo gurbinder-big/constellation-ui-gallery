@@ -16,9 +16,9 @@ import type Graphic from '@arcgis/core/Graphic';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { StyledClearBtn, StyledPegaExtensionsMap } from './styles';
 import { getAllFields, renderShapes, createGraphic, deletePoints, addPoint, addScreenShot } from './utils';
-import '../create-nonce';
+import '../shared/create-nonce';
 
-const ARCGIS_VERSION = '4.33';
+const ARCGIS_VERSION = '4.34';
 type MapProps = {
   getPConnect?: any;
   heading?: string;
@@ -438,7 +438,6 @@ export const PegaExtensionsMap = (props: MapProps) => {
       view?.graphics.removeAll();
       view?.destroy();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [Latitude, Longitude, Zoom, bFreeFormDrawing, bShowSearch, createTools, displayMode, selectionProperty, apiKey]);
 
   useEffect(() => {
@@ -482,7 +481,6 @@ export const PegaExtensionsMap = (props: MapProps) => {
 
         await initComponent();
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error('Failed to load ArcGIS scripts:', error);
       }
     };

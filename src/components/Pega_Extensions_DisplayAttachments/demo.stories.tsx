@@ -1,4 +1,4 @@
-import type { StoryObj } from '@storybook/react';
+import type { StoryObj } from '@storybook/react-webpack5';
 import { PegaExtensionsDisplayAttachments, type UtilityListProps } from './index';
 
 export default {
@@ -17,7 +17,7 @@ export default {
   },
   parameters: {
     a11y: {
-      element: '#storybook-root',
+      context: '#storybook-root',
       config: {
         rules: [
           {
@@ -279,6 +279,13 @@ const setPCore = () => {
         },
       };
     },
+    getPubSubUtils: () => {
+      return {
+        publish: () => {
+          /* nothing */
+        },
+      };
+    },
   };
 };
 
@@ -314,7 +321,7 @@ export const Default: Story = DisplayAttachmentsDemo({
   enableDownloadAll: false,
   dataPage: 'D_AttachmentListRO',
   displayFormat: 'list',
-  icon: 'clipboard',
+  iconName: 'clipboard',
 });
 
 export const Tiles: Story = DisplayAttachmentsDemo({
@@ -325,5 +332,5 @@ export const Tiles: Story = DisplayAttachmentsDemo({
   enableDownloadAll: true,
   dataPage: 'D_AttachmentListRO',
   displayFormat: 'tiles',
-  icon: 'clipboard',
+  iconName: 'clipboard',
 });

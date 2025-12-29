@@ -1,4 +1,4 @@
-import type { StoryObj } from '@storybook/react';
+import type { StoryObj } from '@storybook/react-webpack5';
 import { PegaExtensionsCheckboxRow, type CheckboxRowProps } from './index';
 
 export default {
@@ -15,6 +15,11 @@ export default {
       },
     },
     displayMode: {
+      table: {
+        disable: true,
+      },
+    },
+    selectAllProperty: {
       table: {
         disable: true,
       },
@@ -156,6 +161,7 @@ export const Default: Story = CheckboxRowDemo({
   labelProperty: '',
   validatemessage: '',
   helperText: '',
+  selectAllProperty: '',
   disabled: false,
   readOnly: false,
   required: false,

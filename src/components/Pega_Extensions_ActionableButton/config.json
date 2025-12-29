@@ -1,51 +1,66 @@
 {
-  "name": "Pega_Extensions_ActionableButton",
-  "label": "Actionable button",
-  "description": "Actionable button",
-  "organization": "Pega",
-  "version": "1.0.0",
-  "library": "Extensions",
-  "allowedApplications": [],
-  "componentKey": "Pega_Extensions_ActionableButton",
-  "type": "Field",
-  "subtype": "Text",
-  "properties": [
-    {
-      "name": "labelOption",
-      "label": "Label value",
-      "format": "SELECT",
-      "defaultValue": "custom",
-      "source": [
+    "name": "Pega_Extensions_ActionableButton",
+    "label": "Actionable button",
+    "description": "Actionable button",
+    "organization": "Pega",
+    "version": "4.0.1",
+    "library": "Extensions",
+    "allowedApplications": [],
+    "componentKey": "Pega_Extensions_ActionableButton",
+    "type": "Field",
+    "subtype": "Text",
+    "properties": [
         {
-          "key": "default",
-          "value": "Default"
+            "name": "labelOption",
+            "label": "Label value",
+            "format": "SELECT",
+            "defaultValue": "custom",
+            "source": [
+                {
+                    "key": "default",
+                    "value": "Default"
+                },
+                {
+                    "key": "custom",
+                    "value": "Custom"
+                }
+            ]
         },
         {
-          "key": "custom",
-          "value": "Custom"
+            "name": "label",
+            "label": "Custom label value",
+            "format": "VALUEINPUT",
+            "required": true,
+            "ruleType": "Paragraph"
+        },
+        {
+            "name": "localAction",
+            "label": "Local Action ID",
+            "format": "TEXT"
+        },
+        {
+            "name": "visibility",
+            "label": "Visible",
+            "format": "VISIBILITY"
+        },
+        {
+            "format": "LABEL",
+            "label": "About",
+            "name": "PegaAboutLabel",
+            "variant": "h3"
+        },
+        {
+            "format": "LABEL",
+            "label": "Pega_Extensions 4.0.1, Mon Nov 17 2025, 26.1.0-dev-15386",
+            "name": "PegaAboutData",
+            "variant": "primary"
         }
-      ]
+    ],
+    "defaultConfig": {
+        "label": "@L $this.label",
+        "localAction": ""
     },
-    {
-      "name": "label",
-      "label": "Custom label value",
-      "format": "VALUEINPUT",
-      "required": true,
-      "ruleType": "Paragraph"
-    },
-    {
-      "name": "localAction",
-      "label": "Local Action ID",
-      "format": "TEXT"
-    },
-    {
-      "name": "visibility",
-      "label": "Visible",
-      "format": "VISIBILITY"
-    }
-  ],
-  "defaultConfig": {
-    "label": "@L $this.label",
-    "localAction": ""
-  }
+    "buildDate": "2025-11-17T16:53:07.719Z",
+    "infinityVersion": "26.1.0-dev-15386",
+    "packageCosmosVersion": "8.8.0"
 }

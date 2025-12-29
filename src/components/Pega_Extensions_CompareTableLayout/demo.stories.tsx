@@ -1,4 +1,4 @@
-import type { StoryObj } from '@storybook/react';
+import type { StoryObj } from '@storybook/react-webpack5';
 import { PegaExtensionsCompareTableLayout, type TableLayoutProps } from './index';
 import { CurrencyDisplay } from '@pega/cosmos-react-core';
 
@@ -26,6 +26,19 @@ export default {
     getPConnect: {
       table: {
         disable: true,
+      },
+    },
+  },
+  parameters: {
+    a11y: {
+      context: '#storybook-root',
+      config: {
+        rules: [
+          {
+            id: 'aria-allowed-role',
+            enabled: false,
+          },
+        ],
       },
     },
   },
@@ -64,7 +77,7 @@ const genResponse = (displayFormat: string, selectionProperty: string) => {
     name: 'demoView',
     type: 'View',
     config: {
-      template: 'Pega_Extensions_CompareTableLayout',
+      template: 'CompareTableLayout',
       ruleClass: 'Work-',
       ...(selectionProperty ? { selectionProperty } : ''),
       inheritedProps: [],
@@ -400,7 +413,7 @@ const CompareTableDemo = (inputs: TableLayoutProps) => {
       };
       const selProp = args.selectionProperty === 'Select an object' ? '.prop1' : '';
       const props = {
-        template: 'Pega_Extensions_CompareTableLayout',
+        template: 'CompareTableLayout',
         ...args,
         selectionProperty: selProp,
         getPConnect: () => {

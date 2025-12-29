@@ -51,6 +51,16 @@ type DatabaseProps = {
   schemaName: string;
   setschemaName: (value: string) => void;
   selectedCaseType: string;
+
+  primaryColumnKey: string;
+  setprimaryColumnKey: (value: string) => void;
+
+  primaryTable: string;
+  setprimaryTable: (value: string) => void;
+
+  tables: Record<string, any>[];
+  primaryTableColumns: Record<string, any>[];
+
   setselectedCaseType: (value: string) => void;
   onSubmit?: () => void;
 };
@@ -75,6 +85,16 @@ const Database = (props: DatabaseProps) => {
     selectedCaseType,
     setselectedCaseType,
     onSubmit,
+
+    tables,
+    primaryTableColumns,
+
+    primaryColumnKey,
+    setprimaryColumnKey,
+
+    primaryTable,
+    setprimaryTable
+
   } = props;
 
   const [selectedDataType, setSelectedDataType] = useState('');
@@ -87,6 +107,7 @@ const Database = (props: DatabaseProps) => {
   }, [selectedDatabase]);
 
   console.log('ok');
+  console.log(primaryTableColumns);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -218,6 +239,48 @@ const Database = (props: DatabaseProps) => {
           </select>
         </FieldRow>
       )}
+
+      <FieldRow>
+        <label htmlFor="primaryTable">
+          Primary Table: <span className="required">*</span>
+        </label>
+        <select
+          id="primaryTable"
+          name="primaryTable"
+          value={primaryTable}
+          onChange={(e) => setprimaryTable(e.target.value)}
+          disabled={!schemaName}
+          required
+        >
+          <option value="">Select</option>
+          { tables.map((t, index) => (
+            <option key={index} value={t.table_name}>
+              { t.table_name }
+            </option>
+          ))}
+        </select>
+      </FieldRow>
+
+      <FieldRow>
+        <label htmlFor="primaryColumn">
+          Primary Column Key: <span className="required">*</span>
+        </label>
+        <select
+          id="primaryColumn"
+          name="primaryColumn"
+          value={primaryColumnKey}
+          onChange={(e) => setprimaryColumnKey(e.target.value)}
+          disabled={!primaryTable}
+          required={!!primaryTable}
+        >
+          <option value="">Select</option>
+          {primaryTableColumns.map((col) => (
+            <option key={col} value={col}>
+              {col}
+            </option>
+          ))}
+        </select>
+      </FieldRow>
 
       <div style={{ marginTop: '16px' }}>
         <Button type='submit'>Next</Button>

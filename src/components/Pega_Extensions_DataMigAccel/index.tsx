@@ -106,15 +106,23 @@ function DataMigAccelComponent(props: DashboardProps) {
   const [schemaName, setschemaName] = useState('');
   const [selectedCaseType, setselectedCaseType] = useState('');
 
+  const [primaryTable, setprimaryTable] = useState('');
+  const [primaryColumnKey, setprimaryColumnKey] = useState('');
+
+  const [columns, setColumns] = useState<any[]>([]);
+
   useEffect(() => {
     setSourceTypes(['page', 'page list']);
     setjoinCriteria(['inner', 'left']);
 
     // for testing
-    // setSelectedDatabase('CustomerData');
-    // setselectedMigrationType('caseType');
-    // setschemaName('dummy');
-    // setselectedCaseType('BIG-GDM-Work-DataMigration');
+
+    setprimaryTable('employees');
+    setprimaryColumnKey('id');
+    setSelectedDatabase('CustomerData');
+    setselectedMigrationType('caseType');
+    setschemaName('dummy');
+    setselectedCaseType('BIG-GDM-Work-DataMigration');
   },[]);
 
   // loading data pages
@@ -173,6 +181,26 @@ function DataMigAccelComponent(props: DashboardProps) {
     }
     loadSchemaNames();
   }, [selectedDatabase, schemaNamesDataPage, context]);
+
+  useEffect(() => {
+    async function fetchTableColumns() {
+      try {
+        const res = await fetchListDataPage(tableDetailsDataPage, context, {
+          dataViewParameters : {
+            Scenario: 3,
+            SourceSchemaName: schemaName,
+            SourceDatabaseName: selectedDatabase,
+            SourceTableName: primaryTable
+          }
+        });
+        const columns = (res?.data || []).map((c: any) => c.column_name);
+        setColumns(rcolumns);
+      } catch (error) {
+        setColumns([]);
+      }
+    }
+    fetchTableColumns();
+  }, [tableDetailsDataPage, selectedDatabase, primaryTable, schemaName, context]);
 
   useEffect(() => {
     async function loadTables() {
@@ -283,6 +311,15 @@ function DataMigAccelComponent(props: DashboardProps) {
 
                   selectedMigrationType={selectedMigrationType}
                   setselectedMigrationType={setselectedMigrationType}
+
+                  tables={tables}
+                  primaryTableColumns={columns}
+
+                   primaryColumnKey={primaryColumnKey}
+                   setprimaryColumnKey={setprimaryColumnKey}
+
+                   primaryTable={primaryTable}
+                   setprimaryTable={setprimaryTable}
 
                   onSubmit={submit}
                 />

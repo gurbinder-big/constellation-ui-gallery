@@ -61,7 +61,6 @@ export type MappingProps = {
 export type StepperProps = {
   steps: string[];
   activeStep: number;
-  setActiveStep: (step: number) => void;
 };
 
 export type TableMappingProps = {

@@ -57,7 +57,6 @@ function DataMigAccelComponent(props: DashboardProps) {
     }
   ];
 
-
   // Dropdown data states
   const [dataBases, setDatabases] = useState<any[]>([]);
   const [schemaNames, setschemaNames] = useState<any[]>([]);
@@ -111,13 +110,12 @@ function DataMigAccelComponent(props: DashboardProps) {
     setjoinCriteria(['inner', 'left']);
 
     // for testing
-
-    setprimaryTable('employees');
-    setprimaryColumnKey('id');
-    setSelectedDatabase('CustomerData');
-    setselectedMigrationType('caseType');
-    setschemaName('dummy');
-    setselectedCaseType('BIG-GDM-Work-DataMigration');
+    // setprimaryTable('employees');
+    // setprimaryColumnKey('id');
+    // setSelectedDatabase('CustomerData');
+    // setselectedMigrationType('caseType');
+    // setschemaName('dummy');
+    // setselectedCaseType('BIG-GDM-Work-DataMigration');
   },[]);
 
   // loading data pages
@@ -132,7 +130,7 @@ function DataMigAccelComponent(props: DashboardProps) {
     }
 
     loadData();
-  }, [dataBaseDataPage, caseTypesDataPage, dataTypesDataPage, context]);
+  }, [dataBaseDataPage, context]);
 
   useEffect(() => {
     if (!selectedMigrationType) return;
@@ -178,6 +176,21 @@ function DataMigAccelComponent(props: DashboardProps) {
   }, [selectedDatabase, schemaNamesDataPage, context]);
 
   useEffect(() => {
+    setprimaryTable('');
+    setprimaryColumnKey('');
+    setColumns([]);
+  }, [selectedDatabase, schemaName]);
+
+  useEffect(() => {
+    setcaseTypes([]);
+    setDataTypes([]);
+  }, [selectedMigrationType]);
+
+  useEffect(() => {
+    if (!selectedDatabase || !schemaName || !primaryTable) {
+      setColumns([]);
+      return;
+    }
     async function fetchTableColumns() {
       try {
         const res = await fetchListDataPage(tableDetailsDataPage, context, {
@@ -222,11 +235,11 @@ function DataMigAccelComponent(props: DashboardProps) {
   }, [selectedDatabase, tableNamesDataPage, schemaName,context]);
 
   useEffect(() => {
+    if (!selectedCaseType) {
+      setCaseTypeProperties([]);
+      return;
+    }
     async function loadCaseTypeProperties() {
-      if (!selectedCaseType) {
-        setCaseTypeProperties([]);
-        return;
-      }
       try {
         const res = await fetchListDataPage(caseTypesPropsDataPage, context, {
           dataViewParameters : {
@@ -325,7 +338,7 @@ function DataMigAccelComponent(props: DashboardProps) {
       <div style={{ marginTop: '16px' }} className='wrap'>
         <h3 style={{ marginBottom: '10px' }}> Data Migration</h3>
         <div>
-          {<Stepper steps={steps} activeStep={activeStep} setActiveStep={setActiveStep} />}
+          {<Stepper steps={steps} activeStep={activeStep} />}
 
           { activeStep === 0 && (
             <>

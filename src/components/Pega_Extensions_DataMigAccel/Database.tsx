@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import styled from 'styled-components';
 import { Button } from '@pega/cosmos-react-core';
 import type { DatabaseProps } from './types';
@@ -74,14 +74,6 @@ const Database = (props: DatabaseProps) => {
   const [selectedDataType, setSelectedDataType] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-
-  useEffect(() => {
-    // setschemaName('dummy');
-    // setselectedCaseType('BIG-GDM-Work-DataMigration');
-  }, [selectedDatabase]);
-
-  console.log('ok');
-  console.log(primaryTableColumns);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

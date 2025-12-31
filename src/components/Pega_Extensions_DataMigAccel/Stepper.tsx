@@ -1,7 +1,7 @@
 import type { StepperProps } from './types';
 
 const Stepper = (props: StepperProps) => {
-  const { steps, activeStep, setActiveStep  } = props;
+  const { steps, activeStep  } = props;
 
   return (
   <div className="dx-stepper">
@@ -13,7 +13,6 @@ const Stepper = (props: StepperProps) => {
         <div
           key={label}
           className={`dx-step ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
-          onClick={() => setActiveStep(index)}
         >
           <div className="dx-step-circle">
             {isCompleted ? '✓' : index + 1}

@@ -215,6 +215,8 @@ const Mapping = (props: MappingProps) => {
   }
 
   const handleSourceTableChange = async (rowId: string, column: string, value: string) => {
+    if (!value) return;
+
     updateRow(rowId, column, value);
     const res = await fetchTableColumns(value);
     const columns = (res?.data || []).map((c: any) => c.column_name);

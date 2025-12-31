@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import { Button, EmptyState, Icon, registerIcon } from '@pega/cosmos-react-core';
 import { fetchListDataPage } from './apiUtils';
+import type { RowType, MappingType, MappingProps } from "./types";
 
 import * as eyeIcon from '@pega/cosmos-react-core/lib/components/Icon/icons/eye.icon';
 import * as trashIcon from '@pega/cosmos-react-core/lib/components/Icon/icons/trash.icon';
@@ -30,55 +31,26 @@ const PopupInner = styled.div`
 `;
 
 const Table = styled.table`
-  width: '100%';
-  border-collapse: 'collapse';
-  margin-top: '12px';
-  margin-bottom: '12px';
+  width: 100%;
+  border-collapse: collapse;
+
+  th, td {
+    padding: 8px;
+    border: 1px solid #dee2e6;
+  }
+
+  th {
+    background: #f8f9fa;
+    text-align: left;
+  }
+
+  select {
+    width: 100%;
+  }
 `;
-
-//mapping
-type MappingType = {
-  id: string;
-  targetProperty: string;
-  sourceTableName: string;
-  sourceProperty: string;
-  joinType: string;
-};
-
-//flow
-type RowType = {
-  id: string;
-  type: string;
-  targetProperty: string;
-  targetPropertyChilds: Record<string, any>[];
-  sourceTableName: string;
-  sourceTableColumns: string[];
-  mappings: MappingType[];
-};
-
-// component
-type MappingProps = {
-  context: any;
-  activeStep: number;
-  tableDetailsDataPage: string;
-  selectedMigrationType: string;
-  schemaName: string;
-  selectedDatabase: string;
-  caseTypeProperties: string[];
-  tables: Record<string, any>[];
-  sourceTypes: string[];
-  joinCriteria: string[];
-  onSubmit?: (data: RowType[]) => void;
-  flowData: RowType[];
-  // setFlowData: (data: RowType[]) => void;
-  setFlowData: (data: RowType[] | ((prev: RowType[]) => RowType[])) => void;
-  setBack?: () => void;
-};
-
 
 const Mapping = (props: MappingProps) => {
   const {
-    activeStep,
     context,
     tables,
     schemaName,
@@ -92,7 +64,6 @@ const Mapping = (props: MappingProps) => {
     setFlowData,
     setBack
   } = props;
-
 
   // const [showJson, setshowJson] = useState(false);
   // const [submitted, setSubmitted] = useState(false);
@@ -199,9 +170,8 @@ const Mapping = (props: MappingProps) => {
                 {
                   id: crypto.randomUUID(),
                   targetProperty: '',
-                  sourceTableName: '',
-                  sourceProperty: '',
-                  joinType: '',
+                  sourceTableName: row.sourceTableName,
+                  sourceProperty: ''
                 },
               ],
             }
@@ -299,7 +269,7 @@ const Mapping = (props: MappingProps) => {
 
   return (
     <>
-      {activeStep === 1 && flowData.length === 0 && (
+      {flowData.length === 0 && (
         <>
           <EmptyState style={{ marginTop: '12px', marginBottom: '12px' }} />
           <Button compact={true} onClick={addRow}>
@@ -425,7 +395,26 @@ const Mapping = (props: MappingProps) => {
                             { currentRow.mappings.map((mapping : MappingType) => (
                               <tr key={mapping.id}>
                                 <td>
-                                  <input value={currentRow.sourceTableName} disabled />
+                                  <select
+                                    className={!mapping.sourceTableName ? 'invalid' : ''}
+                                    value={mapping.sourceTableName}
+                                    onChange={e =>
+                                      updateMappingField(
+                                        currentRow.id,
+                                        mapping.id,
+                                        'sourceTableName',
+                                        e.target.value
+                                      )
+                                    }
+                                  >
+                                    <option value="">Select</option>
+                                    { tables.map(t => (
+                                      <option key={t.table_name} value={t.table_name}>
+                                        { t.table_name }
+                                      </option>
+                                    ))}
+                                  </select>
+
                                 </td>
 
                                 <td>

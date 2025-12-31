@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Button } from '@pega/cosmos-react-core';
+import type { DatabaseProps } from './types';
 
 const Form = styled.form`
   width: 100%;
@@ -37,33 +38,6 @@ const FieldRow = styled.div`
     color: red;
   }
 `;
-
-type DatabaseProps = {
-  dataBases: { pyRWDatabase: string }[];
-  migrationTypes: { id: string; label: string }[];
-  schemaNames: { SchemaName: string }[];
-  caseTypes: { pyLabel: string, pyCaseClass: string }[];
-  dataTypes: { id: string; label: string }[];
-  selectedDatabase: string;
-  selectedMigrationType: string;
-  setSelectedDatabase: (value: string) => void;
-  setselectedMigrationType: (value: string) => void;
-  schemaName: string;
-  setschemaName: (value: string) => void;
-  selectedCaseType: string;
-
-  primaryColumnKey: string;
-  setprimaryColumnKey: (value: string) => void;
-
-  primaryTable: string;
-  setprimaryTable: (value: string) => void;
-
-  tables: Record<string, any>[];
-  primaryTableColumns: Record<string, any>[];
-
-  setselectedCaseType: (value: string) => void;
-  onSubmit?: () => void;
-};
 
 const Database = (props: DatabaseProps) => {
   const {

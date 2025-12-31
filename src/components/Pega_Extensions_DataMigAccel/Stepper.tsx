@@ -1,8 +1,4 @@
-type StepperProps = {
-  steps: string[];
-  activeStep: number;
-  setActiveStep: (step: number) => void;
-};
+import type { StepperProps } from './types';
 
 const Stepper = (props: StepperProps) => {
   const { steps, activeStep, setActiveStep  } = props;

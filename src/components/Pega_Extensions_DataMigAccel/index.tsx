@@ -4,10 +4,12 @@ import { withConfiguration } from '@pega/cosmos-react-core';
 import { Button } from '@pega/cosmos-react-core';
 import Database from './Database';
 import Mapping from './Mapping';
+import TableMapping from './TableMapping';
 import Stepper from './Stepper';
 import type { PConnFieldProps } from './PConnProps';
 import GlobalStyle from './styles';
 import { fetchListDataPage } from './apiUtils';
+import type { RowType, MappingRow } from './types';
 
 const DashboardWrapper = styled.div`
   background: #ffffff;
@@ -37,46 +39,13 @@ interface DashboardProps extends PConnFieldProps {
   dataTypesDataPage: string;
 }
 
-//mapping
-type MappingType = {
-  id: string;
-  targetProperty: string;
-  sourceTableName: string;
-  sourceProperty: string;
-  joinType: string;
-};
-
-//flow
-type RowType = {
-  id: string;
-  type: string;
-  targetProperty: string;
-  targetPropertyChilds: Record<string, any>[];
-  sourceTableName: string;
-  sourceTableColumns: string[];
-  mappings: MappingType[];
-};
-
 function DataMigAccelComponent(props: DashboardProps) {
   const { getPConnect, dataBaseDataPage, caseTypesDataPage, tableNamesDataPage, tableDetailsDataPage, caseTypesPropsDataPage, schemaNamesDataPage, dataTypesDataPage } = props;
 
   const PConnect = getPConnect();
   const context = PConnect.getContextName();
   const [flowData, setFlowData] = useState<RowType[]>([]);
-
-  useEffect(() => {
-    setFlowData([{
-      id: crypto.randomUUID(),
-      type: 'primary',
-      targetProperty: '',
-      targetPropertyChilds: [],
-      sourceTableName: '',
-      sourceTableColumns: [],
-      mappings: []
-    }]);
-  }, []);
-
-  const steps = ['DB', 'Map Fields', 'Review'];
+  const steps = ['DB', 'Map Tables for Join', 'Map Fields', 'Review'];
   const migrationTypes = [
     {
       id: 'caseType',
@@ -110,6 +79,32 @@ function DataMigAccelComponent(props: DashboardProps) {
   const [primaryColumnKey, setprimaryColumnKey] = useState('');
 
   const [columns, setColumns] = useState<any[]>([]);
+
+  const [tableMappings, setTableMappings] = useState<MappingRow[]>([]);
+
+  useEffect(() => {
+    setFlowData([{
+      id: crypto.randomUUID(),
+      type: 'primary',
+      targetProperty: '',
+      targetPropertyChilds: [],
+      sourceTableName: '',
+      sourceTableColumns: [],
+      mappings: []
+    }]);
+
+    setTableMappings([{
+      id: crypto.randomUUID(),
+      sourceTable: '',
+      sourceColumn: '',
+      targetTable: '',
+      join: '',
+      targetColumn: '',
+      sourceColumns: [],
+      targetColumns: []
+    }]);
+
+  }, []);
 
   useEffect(() => {
     setSourceTypes(['page', 'page list']);
@@ -194,8 +189,9 @@ function DataMigAccelComponent(props: DashboardProps) {
           }
         });
         const columns = (res?.data || []).map((c: any) => c.column_name);
-        setColumns(rcolumns);
-      } catch (error) {
+        setColumns(columns);
+      } catch (e) {
+        console.log(e);
         setColumns([]);
       }
     }
@@ -273,14 +269,55 @@ function DataMigAccelComponent(props: DashboardProps) {
   };
 
   const mappingSubmit = (flows: RowType[]) => {
-    console.log('in index');
     setActiveStep((prev) => prev + 1);
     setFlowData(flows);
   };
 
-  // const handleFinalSubmit = () => {
-  //   console.log('Final submission');
-  // };
+  const tableMappingSubmit = () => {
+    setActiveStep((prev) => prev + 1);
+    // setFlowData(flows);
+  };
+
+  const preparePayloadForSubmit = ({
+    primaryTable,
+    primaryColumnKey,
+    tableMappings,
+    flowData
+  }: any) => ({
+    primarySourceDetails: {
+      primaryTable,
+      primaryColumnKey
+    },
+
+    dbJoinMappings: tableMappings.map((m: any) => {
+      const copy = { ...m };
+      delete copy.id;
+      delete copy.sourceColumns;
+      delete copy.targetColumns;
+      return copy;
+    }),
+
+    flows: flowData.map((f: any) => {
+      const flowCopy = { ...f };
+      delete flowCopy.id;
+      delete flowCopy.sourceTableColumns;
+      delete flowCopy.targetPropertyChilds;
+
+      return {
+        ...flowCopy,
+        mappings: f.mappings.map((mp: any) => {
+          const mappingCopy = { ...mp };
+          delete mappingCopy.id;
+          return mappingCopy;
+        })
+      };
+    })
+  });
+
+
+  const handleFinalSubmit = () => {
+    console.log('Final submission');
+  };
 
   return (
     <DashboardWrapper>
@@ -292,7 +329,7 @@ function DataMigAccelComponent(props: DashboardProps) {
 
           { activeStep === 0 && (
             <>
-              <div style={{ width: '80%', marginTop: '20px' }}>
+              <div style={{ width: '80%', marginTop: '20px',  marginLeft: 'auto', marginRight: 'auto' }}>
                 <Database
                   dataBases={dataBases}
                   migrationTypes={migrationTypes}
@@ -329,11 +366,29 @@ function DataMigAccelComponent(props: DashboardProps) {
 
           { activeStep === 1 && (
             <>
-              <Mapping
+              <div style={{ width: '80%', marginTop: '20px', marginLeft: 'auto', marginRight: 'auto' }}>
+                <TableMapping
+                  rows={tableMappings}
+                  setRows={setTableMappings}
+                  context={context}
+                  setBack={setBack}
+                  tables={tables}
+                  tableDetailsDataPage={tableDetailsDataPage}
+                  SourceSchemaName={schemaName}
+                  SourceDatabaseName={selectedDatabase}
+                  onSubmit={tableMappingSubmit}
+                />
+              </div>
+            </>
+          )}
+
+          { activeStep === 2 && (
+            <>
+              <div style={{ width: '80%', marginTop: '20px', marginLeft: 'auto', marginRight: 'auto' }}>
+                <Mapping
                 context={context}
                 tableDetailsDataPage={tableDetailsDataPage}
                 selectedMigrationType={selectedMigrationType}
-                activeStep={activeStep}
                 sourceTypes={sourceTypes}
                 joinCriteria={joinCriteria}
                 tables={tables}
@@ -346,16 +401,36 @@ function DataMigAccelComponent(props: DashboardProps) {
                 onSubmit={mappingSubmit}
                 setBack={setBack}
               />
+              </div>
             </>
           )}
 
-          { activeStep === 2 && (
+          { activeStep === 3 && (
             <>
-              <div className="json-box">
-                <pre>{JSON.stringify(flowData, null, 2)}</pre>
+              <div style={{ width: '80%', marginTop: '20px', marginLeft: 'auto', marginRight: 'auto' }}>
+                <div className="json-box">
+                  <pre>
+                    {JSON.stringify(
+                      preparePayloadForSubmit({
+                        primaryTable,
+                        primaryColumnKey,
+                        tableMappings,
+                        flowData
+                      }),
+                      null,
+                      2
+                    )}
+                  </pre>
+                </div>
+
+                <Button type="button" onClick={setBack}>
+                  Back
+                </Button>
+
+                <Button variant="primary" onClick={handleFinalSubmit}>
+                  Submit
+                </Button>
               </div>
-              <Button onClick={setBack}> Back </Button>
-              <Button variant="primary"> Submit </Button>
             </>
           )}
 

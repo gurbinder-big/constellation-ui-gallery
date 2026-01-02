@@ -15,20 +15,33 @@ function PegaExtensionsCameraCapture(props: CameraComponentProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const [showToast, setShowToast] = useState(false);
+  type MessageVariant = 'success' | 'error';
+
+  const [messageState, setMessageState] = useState<{
+    visible: boolean;
+    message: string;
+    variant: MessageVariant;
+  }>({
+    visible: false,
+    message: '',
+    variant: 'success',
+  });
+
   const [cameraActive, setCameraActive] = useState(false);
   const [capturedImg, setCapturedImg] = useState<string | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [videoDims, setVideoDims] = useState<{ width: number; height: number } | null>(null);
   const [containerWidth, setContainerWidth] = useState<number>(0);
-  const pConn = useMemo(() => getPConnect(), [getPConnect]);
+  const pConn = getPConnect();
   const context = pConn.getContextName();
+
+  const IMAGE_MIME = 'image/png';
 
   const caseInfo = useMemo(() => {
     return (
       pConn.getValue((window as any).PCore.getConstants().CASE_INFO.CASE_INFO) || {}
     );
-  }, [getPConnect]);
+  }, [pConn]);
 
   useEffect(() => {
     const now = new Date();
@@ -64,7 +77,7 @@ function PegaExtensionsCameraCapture(props: CameraComponentProps) {
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const cr = entry.contentRect;
-        if (cr.width) {
+        if (Math.round(cr.width) !== containerWidth) {
           setContainerWidth(Math.round(cr.width));
         }
       }
@@ -75,32 +88,44 @@ function PegaExtensionsCameraCapture(props: CameraComponentProps) {
     return () => ro.disconnect();
   }, []);
 
+  const showMessage = (
+    message: string,
+    variant: MessageVariant = 'success'
+  ) => {
+    setMessageState({
+      visible: true,
+      message,
+      variant,
+    });
+
+    setTimeout(() => {
+      setMessageState((prev) => ({ ...prev, visible: false }));
+    }, 3000);
+  };
+
   const startCamera = async () => {
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
       setCapturedImg(null);
       setStream(mediaStream);
       setCameraActive(true);
-    } catch (err) {
-      console.error('Camera access error:', err);
+    } catch {
+      showMessage('Camera access denied or unavailable.', 'error');
     }
   };
 
   const stopCamera = useCallback(() => {
-    if (stream) {
-      stream.getTracks().forEach((t) => t.stop());
-    }
+    stream?.getTracks().forEach(t => t.stop());
     setStream(null);
     setCapturedImg(null);
     setCameraActive(false);
   }, [stream]);
 
-  // useEffect(() => {
-  //   return () => {
-  //     stopCamera();
-  //   };
-  // }, []);
-
+  const stopCameraStream = () => {
+    stream?.getTracks().forEach(t => t.stop());
+    setStream(null);
+    setCameraActive(false);
+  };
 
   const handleLoadedMetadata = () => {
     const v = videoRef.current;
@@ -135,8 +160,10 @@ function PegaExtensionsCameraCapture(props: CameraComponentProps) {
       return;
     }
     canvasContext.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-    const capturedImageData = canvasElement.toDataURL('image/png');
+    const capturedImageData = canvasElement.toDataURL(IMAGE_MIME);
+
     setCapturedImg(capturedImageData);
+    stopCameraStream();
   };
 
 
@@ -148,7 +175,7 @@ function PegaExtensionsCameraCapture(props: CameraComponentProps) {
   const base64ToFile = (base64String: string, fileName: string) => {
     const [metadata, base64Data] = base64String.split(',');
     const mimeMatch = metadata.match(/:(.*?);/);
-    const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
+    const mimeType = mimeMatch ? mimeMatch[1] : IMAGE_MIME;
     const binaryString = atob(base64Data);
     const byteLength = binaryString.length;
     const byteArray = new Uint8Array(byteLength);
@@ -187,9 +214,6 @@ function PegaExtensionsCameraCapture(props: CameraComponentProps) {
       context
     );
     stopCamera();
-    setCapturedImg(null);
-    setStream(null);
-    setCameraActive(false);
   };
 
   const handleUpload = async () => {
@@ -199,27 +223,36 @@ function PegaExtensionsCameraCapture(props: CameraComponentProps) {
     const fileName = `${attachmentFieldName || `camera_capture_${id}`}.png`;
     const file = base64ToFile(capturedImg, fileName);
     (file as any).ID = id;
+    try {
+      const res = await (window as any).PCore.getAttachmentUtils().uploadAttachment(
+        file as any,
+        onUploadProgress,
+        errorHandler,
+        context
+      );
 
-    console.log(file);
+      if (!res?.ID) {
+        throw new Error('Upload failed');
+      }
 
-    const res = await (window as any).PCore.getAttachmentUtils().uploadAttachment(
-      file as any,
-      onUploadProgress,
-      errorHandler,
-      context
-    );
-    linkFile((res as any).ID, fileName);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
+      await linkFile(res.ID, fileName);
+      showMessage('Attachment added to case successfully', 'success');
+    } catch {
+      showMessage('Failed to upload attachment. Please try again.', 'error');
+    }
   };
 
   return (
     <StyledPegaExtensionsCameraCaptureWrapper>
-      {showToast && (
-        <div className="custom-toast">
-          Attachment added to case successfully
-        </div>
-      )}
+    {messageState.visible && (
+      <div
+        className={`custom-toast custom-toast--${messageState.variant}`}
+        role="status"
+        aria-live="polite"
+      >
+        {messageState.message}
+      </div>
+    )}
       <Card>
         <CardContent>
           <Flex container={{ direction: 'column', gap: 2 }}>

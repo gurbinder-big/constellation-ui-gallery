@@ -5,86 +5,22 @@ import * as DemoStories from './demo.stories';
 
 # Overview
 
-The **Camera Capture** widget allows users to capture photos using their device camera and save them as case attachments.
+The **Camera Capture** widget lets users take photos using their device camera and save them directly as case attachments. It provides a simple and intuitive interface for capturing, previewing, and attaching images to a case.
 
-This component provides a streamlined UI for starting the camera, previewing the live feed, capturing an image, retaking it if necessary, and uploading the final result directly to the case.
+It provides a streamlined UI for:
+- Starting the camera and previewing the live feed
+- Capturing an image
+- Retaking the image if necessary
+- Uploading the final image directly to a case
 
-It is designed to work seamlessly with Pega Constellation and the DX Components attachment framework.
 
-### Key Features
+#### Widget Configuration
 
-- **Start Camera & Live Preview**
-  Users can activate their device camera and view the live stream in real time.
-
-- **Capture Image**
-  A still frame is captured from the video feed and rendered as a preview.
-
-- **Retake Option**
-  Users can discard the captured image and re-open the camera.
-
-- **Upload to Case**
-  Captured images are converted to a file object and uploaded using:
-  - `uploadAttachment`
-  - `linkAttachmentsToCase`
-
-- **Automatic Cleanup**
-  Camera streams are automatically stopped on:
-  - capture
-  - upload completion
-  - component unmount
-
-- **Responsive Camera Container**
-  Uses `ResizeObserver` to scale to the available width.
-
----
-
-# Behavior Details
-
-- The camera runs only when explicitly activated.
-- Once the image is captured:
-  - the camera stream is stopped,
-  - the preview is shown,
-  - users may upload or retake.
-- After a successful upload:
-  - camera is stopped,
-  - preview reset,
-  - UI returns to initial state.
-- Files are uploaded in PNG format, with unique IDs generated automatically.
-- The widget supports any Constellation case type, and uses the current view’s context.
-
----
-
-# Widget Configuration
-
-This widget does not require additional configuration parameters.
-
-However, it relies on:
+This widget does not require additional configuration parameters. However, it relies on:
 
 - **Case Info** from Pega:
   - retrieved using `getPConnect().getValue(CASE_INFO)`
-- **Context Name**:
-  - via `getPConnect().getContextName()`
 
-### Attachment Handling
-
-The widget internally manages:
-
-- Base64 → File conversion
-- Upload progress callback
-- Upload error handling
-- Linking the uploaded attachment to the case
-
----
-
-# Technical Notes
-
-- Uses the browser's `navigator.mediaDevices.getUserMedia({ video: true })`
-- Uses `<canvas>` to generate PNG image blobs
-- Ensures proper cleanup of MediaStream tracks
-- Works on mobile and desktop browsers that support camera APIs
-- Constellation-compliant attachment linking
-
----
 
 <Primary />
 

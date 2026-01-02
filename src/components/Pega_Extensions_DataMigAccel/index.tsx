@@ -37,10 +37,11 @@ interface DashboardProps extends PConnFieldProps {
   tableNamesDataPage: string;
   tableDetailsDataPage: string;
   dataTypesDataPage: string;
+  finalSubmissionDataPage: string;
 }
 
 function DataMigAccelComponent(props: DashboardProps) {
-  const { getPConnect, dataBaseDataPage, caseTypesDataPage, tableNamesDataPage, tableDetailsDataPage, caseTypesPropsDataPage, schemaNamesDataPage, dataTypesDataPage } = props;
+  const { getPConnect, dataBaseDataPage, caseTypesDataPage, tableNamesDataPage, tableDetailsDataPage, caseTypesPropsDataPage, schemaNamesDataPage, dataTypesDataPage, finalSubmissionDataPage } = props;
 
   const PConnect = getPConnect();
   const context = PConnect.getContextName();
@@ -327,10 +328,48 @@ function DataMigAccelComponent(props: DashboardProps) {
     })
   });
 
+  const handleSubmit = async () => {
+    const finalObj = preparePayloadForSubmit({
+      primaryTable,
+      primaryColumnKey,
+      tableMappings,
+      flowData
+    });
 
-  const handleFinalSubmit = () => {
-    console.log('Final submission');
-  };
+    try {
+      const res = await PCore.getRestClient().invokeRestApi('updateDataObject',{
+        queryPayload: {
+          data_view_ID: finalSubmissionDataPage
+        },
+        body:{
+          JSONMapping: finalObj
+        }
+      });
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // const handleFinalSubmit = async () => {
+  //   console.log('Final submission');
+  //   try {
+  //     const finalObj = preparePayloadForSubmit({
+  //       primaryTable,
+  //       primaryColumnKey,
+  //       tableMappings,
+  //       flowData
+  //     });
+  //     const res = await fetchPageDataPage(finalSubmissionDataPage, context, {
+  //       dataViewParameters : {
+  //         JSONMappng: finalObj,
+  //       }
+  //     });
+  //     console.log(res);
+  //   } catch (err) {
+  //     console.error('Error loading data pages:', err);
+  //   }
+  // };
 
   return (
     <DashboardWrapper>
@@ -440,9 +479,14 @@ function DataMigAccelComponent(props: DashboardProps) {
                   Back
                 </Button>
 
-                <Button variant="primary" onClick={handleFinalSubmit}>
+                { /* <Button variant="primary" onClick={handleFinalSubmit}>
+                  Submit
+                </Button> */ }
+
+                <Button variant="primary" onClick={handleSubmit}>
                   Submit
                 </Button>
+
               </div>
             </>
           )}

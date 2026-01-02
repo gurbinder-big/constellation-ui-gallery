@@ -47,6 +47,11 @@
       "name": "tableDetailsDataPage",
       "label": "Table Details Data Page",
       "format": "TEXT"
+    },
+    {
+      "name": "finalSubmissionDataPage",
+      "label": "Final Submission Data Page",
+      "format": "TEXT"
     }
   ],
   "defaultConfig": {

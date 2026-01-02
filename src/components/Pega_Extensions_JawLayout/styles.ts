@@ -2,50 +2,64 @@ import styled from 'styled-components';
 import { Button } from '@pega/cosmos-react-core';
 
 export const DentalChartContainer = styled.div`
-  padding: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  padding: 0;
+  background: none;
+  border: none;
   overflow-x: auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
 `;
 
-export const ChartHeader = styled.h3`
-  text-align: center;
-  margin-top: 0;
-  margin-bottom: 1.5rem;
-  line-height: 1.2;
-`;
-
-export const ViewToggleContainer = styled.div`
+export const JawsWrapper = styled.div`
   display: flex;
-  justify-content: center;
-  gap: 0.5rem;
+  gap: 1.5rem;
+  justify-content: flex-start;
+  align-items: flex-start;
   flex-wrap: wrap;
+  width: auto;
+  align-self: flex-start;
 `;
+
+export const JawSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 0 0 auto;
+`;
+
+export const JawTitle = styled.h4`
+  font-weight: 400;
+  font-size: 0.85rem;
+  margin-bottom: -0.5rem;
+`;
+
 export const JawContainer = styled.div`
   position: relative;
-  width: 28.125rem;
-  height: 15.625rem;
+  width: 25rem;
+  height: 12.625rem;
   margin-bottom: 1.5rem;
 `;
 
 export const ToothContainer = styled.div.attrs<{ top: number; left: number }>(({ top, left }) => ({
   style: {
     top: `calc(100% - ${top}rem)`,
-    left: `calc(50% + ${left}rem)`,
+    left: `${left + 10.5}rem`, // center arc in 25rem wide container
   },
 }))<{ top: number; left: number }>`
   position: absolute;
-  transform: translate(-50%, -50%);
+  transform: translateY(-50%);
 `;
 
-export const ToothButton = styled(Button)<{ status: string; exists: boolean }>`
+export const ToothButton = styled(Button)<{ status: string; exists: boolean; readOnly?: boolean }>`
   &.tooth-button {
-    width: 2.1875rem;
-    height: 2.5125rem;
-    font-size: 0.6875rem;
+    width: 1.75rem;
+    height: 2rem;
+    font-size: 0.625rem;
     font-weight: bold;
-    border: 0.125rem solid ${({ theme }) => theme.base.palette['border-line']};
+    border: 0.0625rem solid ${({ theme }) => theme.base.palette['border-line']};
     border-radius: 40% 40% 50% 50% / 50%;
     background-color: ${({ status, exists, theme }) => {
       if (!exists) return theme.base.palette['secondary-background'];
@@ -67,22 +81,25 @@ export const ToothButton = styled(Button)<{ status: string; exists: boolean }>`
 `;
 
 export const LegendContainer = styled.div({
-  marginTop: '1rem',
+  marginTop: '0.4rem',
+  marginBottom: '2.1rem',
   display: 'flex',
-  justifyContent: 'center',
-  gap: '1rem',
+  justifyContent: 'flex-start',
+  gap: '0.75rem',
   flexWrap: 'wrap',
+  alignSelf: 'flex-start',
 });
 
 export const LegendItem = styled.div(() => ({
   display: 'flex',
   alignItems: 'center',
-  gap: '0.25rem',
+  gap: '0.15rem',
+  fontSize: '0.75rem',
 }));
 
 export const LegendColorSwatch = styled.div<{ status: 'healthy' | 'missing' | 'extracted' }>`
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 0.85rem;
+  height: 0.85rem;
   border-radius: 50%;
   border: 0.0625rem solid ${({ theme }) => theme.base.palette['border-line']};
   background-color: ${({ status, theme }) => {

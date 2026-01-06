@@ -3,6 +3,7 @@ export type MappingType = {
   id: string;
   targetProperty: string;
   sourceTableName: string;
+  sourceTableColumns: string[];
   sourceProperty: string;
 };
 

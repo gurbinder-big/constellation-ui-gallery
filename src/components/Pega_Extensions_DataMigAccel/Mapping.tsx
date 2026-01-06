@@ -456,7 +456,7 @@ const Mapping = (props: MappingProps) => {
                                     }
                                   >
                                     <option value="">Select</option>
-                                    { {(mapping.sourceTableColumns ?? []).map(t => (
+                                    { (mapping.sourceTableColumns ?? []).map(t => (
                                       <option key={t} value={t}>
                                         {t}
                                       </option>

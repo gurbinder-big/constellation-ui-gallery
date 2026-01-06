@@ -337,13 +337,15 @@ function DataMigAccelComponent(props: DashboardProps) {
     });
 
     try {
-      const res = await PCore.getRestClient().invokeRestApi('createDataObject',{
+      const res = await PCore.getRestClient().invokeRestApi('createDataObject', {
         queryPayload: {
           data_view_ID: finalSubmissionDataPage
         },
-        body:{
+        body: {
           data : {
-            MappingJsonData: JSON.stringify(finalObj)
+            MappingJsonData: JSON.stringify(finalObj),
+            MappingStatus: "new",
+            ClassName: selectedCaseType
           }
         }
       });

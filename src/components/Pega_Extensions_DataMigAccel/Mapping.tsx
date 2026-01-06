@@ -159,6 +159,29 @@ const Mapping = (props: MappingProps) => {
     );
   };
 
+  const updateMappingSourceTableAndColumns = async (rowId : string, mappingId : string, field : string, value : string) => {
+    let columns: string[] = [];
+    try {
+      const res = await fetchTableColumns(value);
+      columns = (res?.data || []).map((c: any) => c.column_name);
+    } catch (e) {
+      columns = [];
+    }
+
+    setFlowData( (prev : RowType[]) =>
+      prev.map((row: RowType) =>
+        row.id === rowId
+          ? {
+              ...row,
+              mappings: row.mappings.map((m: MappingType) =>
+                m.id === mappingId ? { ...m, [field]: value, sourceTableColumns : columns, sourceProperty : '' } : m
+              )
+            }
+          : row
+      )
+    );
+  };
+
   const addCaseTypeMapping = (rowId: string) => {
     setFlowData((prev: RowType[]) =>
       prev.map((row : RowType) =>
@@ -171,6 +194,7 @@ const Mapping = (props: MappingProps) => {
                   id: crypto.randomUUID(),
                   targetProperty: '',
                   sourceTableName: row.sourceTableName,
+                  sourceTableColumns: [],
                   sourceProperty: ''
                 },
               ],
@@ -401,7 +425,7 @@ const Mapping = (props: MappingProps) => {
                                     className={!mapping.sourceTableName ? 'invalid' : ''}
                                     value={mapping.sourceTableName}
                                     onChange={e =>
-                                      updateMappingField(
+                                      updateMappingSourceTableAndColumns(
                                         currentRow.id,
                                         mapping.id,
                                         'sourceTableName',
@@ -416,7 +440,6 @@ const Mapping = (props: MappingProps) => {
                                       </option>
                                     ))}
                                   </select>
-
                                 </td>
 
                                 <td>
@@ -433,7 +456,7 @@ const Mapping = (props: MappingProps) => {
                                     }
                                   >
                                     <option value="">Select</option>
-                                    {currentRow.sourceTableColumns.map(t => (
+                                    { {(mapping.sourceTableColumns ?? []).map(t => (
                                       <option key={t} value={t}>
                                         {t}
                                       </option>
@@ -489,7 +512,7 @@ const Mapping = (props: MappingProps) => {
                         </Button>
 
                         <Button variant="secondary" onClick={closePopup} disabled={hasErrors}>
-                          Close
+                          Save & Close
                         </Button>
                       </>
                     )}

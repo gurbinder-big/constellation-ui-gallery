@@ -73,6 +73,14 @@ const Mapping = (props: MappingProps) => {
   const [isPrimary, setIsPrimary] = useState(false);
   const flowformRef = useRef<HTMLFormElement>(null);
 
+  // remove properties, which dont have ChildProperties
+  const caseTypePropertiesWithChildren = useMemo(() => {
+    return (caseTypeProperties || []).filter(
+      (t: any) =>
+        Array.isArray(t.ChildProperties) && t.ChildProperties.length > 0
+    );
+  }, [caseTypeProperties]);
+
   useEffect(() => {
     console.log('flowData after render:', flowData);
   }, [flowData]);
@@ -332,7 +340,7 @@ const Mapping = (props: MappingProps) => {
                 </tr>
               </thead>
               <tbody>
-                {flowData.map((row) => (
+                { flowData.map((row) => (
                   <tr key={row.id}>
                     <td>
                     {
@@ -378,7 +386,7 @@ const Mapping = (props: MappingProps) => {
                           }
                         >
                           <option value="">Select</option>
-                          {caseTypeProperties.map((t: any) => (
+                          {caseTypePropertiesWithChildren.map((t: any) => (
                             <option key={t.pyPropertyName} value={t.pyPropertyName}>
                               { t.pyPropertyName }
                             </option>

@@ -164,7 +164,7 @@ const Mapping = (props: MappingProps) => {
     try {
       const res = await fetchTableColumns(value);
       columns = (res?.data || []).map((c: any) => c.column_name);
-    } catch (e) {
+    } catch {
       columns = [];
     }
 

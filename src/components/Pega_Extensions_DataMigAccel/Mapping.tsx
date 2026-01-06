@@ -168,7 +168,7 @@ const Mapping = (props: MappingProps) => {
       columns = [];
     }
 
-    setFlowData( (prev : RowType[]) =>
+    setFlowData((prev : RowType[]) =>
       prev.map((row: RowType) =>
         row.id === rowId
           ? {
@@ -182,24 +182,38 @@ const Mapping = (props: MappingProps) => {
     );
   };
 
-  const addCaseTypeMapping = (rowId: string) => {
-    setFlowData((prev: RowType[]) =>
-      prev.map((row : RowType) =>
-        row.id === rowId
+  const addCaseTypeMapping = async (row: RowType) => {
+    if (!row.sourceTableName) {
+      alert('Please select Source Table first');
+      return;
+    }
+
+    let columns: string[] = [];
+
+    try {
+      const res = await fetchTableColumns(row.sourceTableName);
+      columns = (res?.data || []).map((c: any) => c.column_name);
+    } catch {
+      columns = [];
+    }
+
+    setFlowData(prev =>
+      prev.map(r =>
+        r.id === row.id
           ? {
-              ...row,
+              ...r,
               mappings: [
-                ...row.mappings,
+                ...r.mappings,
                 {
                   id: crypto.randomUUID(),
                   targetProperty: '',
                   sourceTableName: row.sourceTableName,
-                  sourceTableColumns: [],
+                  sourceTableColumns: columns,
                   sourceProperty: ''
-                },
-              ],
+                }
+              ]
             }
-          : row
+          : r
       )
     );
   };
@@ -398,7 +412,7 @@ const Mapping = (props: MappingProps) => {
                     { currentRow.mappings.length === 0 ? (
                       <>
                         <EmptyState style={{ marginTop: 12, marginBottom: 12 }} />
-                        <Button variant="primary" onClick={() => addCaseTypeMapping(currentRow.id)}>
+                        <Button variant="primary" onClick={() => addCaseTypeMapping(currentRow)}>
                           Add Mapping
                         </Button>
                         <Button variant="secondary" onClick={closePopup}>
@@ -507,7 +521,7 @@ const Mapping = (props: MappingProps) => {
                         )}
 
                         <br />
-                        <Button variant="primary" onClick={() => addCaseTypeMapping(currentRow.id)}>
+                          <Button variant="primary" onClick={() => addCaseTypeMapping(currentRow)}>
                           Add Mapping
                         </Button>
 

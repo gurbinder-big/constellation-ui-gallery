@@ -345,7 +345,8 @@ function DataMigAccelComponent(props: DashboardProps) {
           data : {
             MappingJsonData: JSON.stringify(finalObj),
             MappingStatus: "new",
-            ClassName: selectedCaseType
+            ClassName: selectedCaseType,
+            MigrationType: selectedMigrationType
           }
         }
       });

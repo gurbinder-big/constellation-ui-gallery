@@ -67,7 +67,7 @@ function DataMigAccelComponent(props: DashboardProps) {
   const [caseTypeProperties, setCaseTypeProperties] = useState<any[]>([]);
 
   const [activeStep, setActiveStep] = useState(0);
-  const [sourceTypes, setSourceTypes] = useState<string[]>([]);
+  const [sourceTypes, setSourceTypes] = useState<any[]>([]);
   const [joinCriteria, setjoinCriteria] = useState<string[]>([]);
 
   const [selectedDatabase, setSelectedDatabase] = useState('');
@@ -87,6 +87,7 @@ function DataMigAccelComponent(props: DashboardProps) {
       id: crypto.randomUUID(),
       type: 'primary',
       targetProperty: '',
+      targetPropertyClass: '',
       targetPropertyChilds: [],
       sourceTableName: '',
       sourceTableColumns: [],
@@ -107,7 +108,7 @@ function DataMigAccelComponent(props: DashboardProps) {
   }, []);
 
   useEffect(() => {
-    setSourceTypes(['page', 'page list']);
+    setSourceTypes([{label : 'Page', value: 'page'}, { label : 'Page list', value: 'pageList'}]);
     setjoinCriteria(['inner', 'left']);
 
     // for testing
@@ -249,9 +250,11 @@ function DataMigAccelComponent(props: DashboardProps) {
         });
         const cleaned = (res?.data ?? []).map(item => {
           const result: {
+            pyPageClass: string;
             pyPropertyName: string;
             ChildProperties?: { pyPropertyName: string }[];
           } = {
+            pyPageClass: item.pyPageClass,
             pyPropertyName: item.pyPropertyName
           };
 
@@ -296,10 +299,13 @@ function DataMigAccelComponent(props: DashboardProps) {
     primaryTable,
     primaryColumnKey,
     tableMappings,
-    flowData
+    flowData,
+    schemaName
   }: any) => ({
     primarySourceDetails: {
-      primaryTable,
+      primaryTable : primaryTable
+        ? `${schemaName}.${primaryTable}`
+        : '',
       primaryColumnKey
     },
 
@@ -308,6 +314,12 @@ function DataMigAccelComponent(props: DashboardProps) {
       delete copy.id;
       delete copy.sourceColumns;
       delete copy.targetColumns;
+      copy.sourceTable = copy.sourceTable
+        ? `${schemaName}.${copy.sourceTable}`
+        : '';
+        copy.targetTable = copy.targetTable
+          ? `${schemaName}.${copy.targetTable}`
+          : '';
       return copy;
     }),
 
@@ -317,11 +329,22 @@ function DataMigAccelComponent(props: DashboardProps) {
       delete flowCopy.sourceTableColumns;
       delete flowCopy.targetPropertyChilds;
 
+      if (flowCopy.type === 'primary') {
+        delete flowCopy.targetPropertyClass;
+      }
+
       return {
         ...flowCopy,
+        sourceTableName: f.sourceTableName
+          ? `${schemaName}.${f.sourceTableName}`
+          : '',
         mappings: f.mappings.map((mp: any) => {
           const mappingCopy = { ...mp };
+          mappingCopy.sourceTableName = mappingCopy.sourceTableName
+            ? `${schemaName}.${mappingCopy.sourceTableName}`
+            : ''
           delete mappingCopy.id;
+          delete mappingCopy.sourceTableColumns;
           return mappingCopy;
         })
       };
@@ -333,7 +356,8 @@ function DataMigAccelComponent(props: DashboardProps) {
       primaryTable,
       primaryColumnKey,
       tableMappings,
-      flowData
+      flowData,
+      schemaName
     });
 
     try {
@@ -472,7 +496,8 @@ function DataMigAccelComponent(props: DashboardProps) {
                         primaryTable,
                         primaryColumnKey,
                         tableMappings,
-                        flowData
+                        flowData,
+                        schemaName
                       }),
                       null,
                       2

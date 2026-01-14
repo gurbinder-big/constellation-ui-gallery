@@ -81,6 +81,9 @@ const Mapping = (props: MappingProps) => {
     );
   }, [caseTypeProperties]);
 
+  console.log(caseTypeProperties);
+
+
   useEffect(() => {
     console.log('flowData after render:', flowData);
   }, [flowData]);
@@ -92,6 +95,7 @@ const Mapping = (props: MappingProps) => {
         id: crypto.randomUUID(),
         type: '',
         targetProperty: '',
+        targetPropertyClass: '',
         targetPropertyChilds: [],
         sourceTableName: '',
         sourceTableColumns: [],
@@ -101,14 +105,18 @@ const Mapping = (props: MappingProps) => {
   };
 
   const updateRowWithChild = (id: string, key: string, value: string) => {
+    console.log(propertyNodeMap);
+    console.log(propertyNodeMap[value]);
     const childProps = propertyNodeMap[value]?.ChildProperties ?? [];
+    const pyPageClass = propertyNodeMap[value]?.pyPageClass ?? "";
     setFlowData((prev: RowType[]) => {
       const updated = prev.map((r: RowType) =>
         r.id === id
           ? {
               ...r,
               [key]: value,
-              targetPropertyChilds: childProps
+              targetPropertyChilds: childProps,
+              targetPropertyClass: pyPageClass
             }
           : r
       );
@@ -146,7 +154,7 @@ const Mapping = (props: MappingProps) => {
     setActiveRow(null);
   };
 
-  const hasPrimary = flowData.some((r) => r.type === 'primary');
+  // const hasPrimary = flowData.some((r) => r.type === 'primary');
   const currentRow = flowData.find(r => r.id === activeRow?.id);
   const targetOptions = isPrimary
     ? caseTypeProperties
@@ -352,8 +360,8 @@ const Mapping = (props: MappingProps) => {
                       <select name='flowType' value={row.type} onChange={(e) => updateRow(row.id, 'type', e.target.value)}>
                         <option value=''>Select</option>
                         {sourceTypes.map((t) => (
-                          <option key={t} value={t} disabled={t === 'primary' && row.type !== 'primary' && hasPrimary}>
-                            {t}
+                          <option key={t.value} value={t.value}>
+                            {t.label}
                           </option>
                         ))}
                       </select>
@@ -372,7 +380,7 @@ const Mapping = (props: MappingProps) => {
                     </td>
 
                     <td>
-                      {row.type !== 'primary' && (
+                      { row.type !== 'primary' && (
                         <select
                           name='flowtargetProperty'
                           required

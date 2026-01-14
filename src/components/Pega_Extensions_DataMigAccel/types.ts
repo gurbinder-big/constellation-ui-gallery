@@ -13,6 +13,7 @@ export type RowType = {
   id: string;
   type: string;
   targetProperty: string;
+  targetPropertyClass: string;
   targetPropertyChilds: Record<string, any>[];
   sourceTableName: string;
   sourceTableColumns: string[];
@@ -51,7 +52,7 @@ export type MappingProps = {
   selectedDatabase: string;
   caseTypeProperties: string[];
   tables: Record<string, any>[];
-  sourceTypes: string[];
+  sourceTypes: Record<string, any>[];
   joinCriteria: string[];
   onSubmit?: (data: RowType[]) => void;
   flowData: RowType[];

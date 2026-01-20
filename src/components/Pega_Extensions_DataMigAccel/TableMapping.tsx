@@ -120,14 +120,15 @@ const TableMapping = ({
   return (
     <TableWrapper>
       <Form id='table-mapping-form' ref={formRef} onSubmit={handleSubmit}>
+        <h3>Define Table Relationships/<h3>
         <Table>
           <thead>
             <tr>
-              <th>Source Table</th>
-              <th>Source Column</th>
+              <th>Left Table</th>
+              <th>Left Column</th>
               <th>Join</th>
-              <th>Target Table</th>
-              <th>Target Column</th>
+              <th>Right Table</th>
+              <th>Right Column</th>
               <th>Action</th>
             </tr>
           </thead>

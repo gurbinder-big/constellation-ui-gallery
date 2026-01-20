@@ -1,0 +1,17 @@
+{
+    "name": "Pega_Extensions_CaseAssignment",
+    "label": "Case Assignment",
+    "description": "Case Assignment",
+    "organization": "Pega",
+    "version": "1.0.0",
+    "library": "Extensions",
+    "allowedApplications": [],
+    "componentKey": "Pega_Extensions_CaseAssignment",
+    "type": "Widget",
+    "subtype": "CASE",
+    "icon": "OneColumnPage.svg",
+    "properties": [],
+    "defaultConfig": {},
+    "infinityVersion": "8.24.50-31",
+    "packageCosmosVersion": "8.8.0"
+}

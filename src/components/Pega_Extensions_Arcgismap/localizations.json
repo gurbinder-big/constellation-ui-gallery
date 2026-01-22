@@ -1,0 +1,10 @@
+{
+  "fields": {
+    "Case type": "Case type",
+    "Key" : "Key",
+    "Status" : "Status",
+    "Stage" : "Stage",
+    "Work list" : "Work list",
+    "Loading Work list" : "Loading Work list"
+  }
+}

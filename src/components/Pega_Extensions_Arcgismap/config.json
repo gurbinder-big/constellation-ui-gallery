@@ -1,0 +1,15 @@
+{
+  "name": "Pega_Extensions_Arcgismap",
+  "label": "Arcgis Map",
+  "description": "Arcgis Map",
+  "organization": "Pega",
+  "version": "4.0.1",
+  "library": "Extensions",
+  "componentKey": "Pega_Extensions_Arcgismap",
+  "type": "Widget",
+  "subtype": "PAGE",
+  "subtypeLabel": "PAGE",
+  "icon": "OneColumnPage.svg",
+  "properties": [],
+  "defaultConfig": {}
+}

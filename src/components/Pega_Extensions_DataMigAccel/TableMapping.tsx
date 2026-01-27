@@ -127,8 +127,8 @@ const TableMapping = ({
               <th>Left Table</th>
               <th>Left Column</th>
               <th>Join</th>
-              <th>Right Table</th>
-              <th>Right Column</th>
+              <th>Joined Table</th>
+              <th>Joined Column</th>
               <th>Action</th>
             </tr>
           </thead>

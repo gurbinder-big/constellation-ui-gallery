@@ -1,0 +1,16 @@
+import { Meta, Primary, Controls, Story } from '@storybook/addon-docs/blocks';
+import * as DemoStories from './demo.stories';
+
+<Meta of={DemoStories} />
+
+# Overview
+
+The `MessagingEventListener` is a template component designed to register for specific events from the messaging server. When a message is received, it triggers a refresh of the current form/assignment to ensure the UI is in sync with server-side state or external updates.
+
+As a template, it acts as a wrapper, allowing developers to insert nested views or fields that will be re-rendered upon the refresh event.
+
+<Primary />
+
+## Props
+
+<Controls />

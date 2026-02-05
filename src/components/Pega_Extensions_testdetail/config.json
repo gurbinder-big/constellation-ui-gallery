@@ -1,0 +1,35 @@
+{
+  "name": "Pega_Extensions_testdetail",
+  "label": "testdetail",
+  "description": "testdetail",
+  "organization": "Pega",
+  "version": "4.0.1",
+  "library": "Extensions",
+  "componentKey": "Pega_Extensions_testdetail",
+  "type": "Template",
+  "subtype": "DETAILS",
+  "subtypeLabel": "DETAILS",
+  "icon": "OneColumnDetails.svg",
+  "properties": [
+    {
+      "name": "showHighlightedData",
+      "label": "Enable highlighted fields",
+      "format": "BOOLEAN"
+    },
+    {
+      "name": "highlightedData",
+      "label": "Highlighted fields",
+      "format": "CONTENTPICKER",
+      "addTypeList": ["Fields"],
+      "visibility": "$this.showHighlightedData = true",
+      "saveToConfig": true
+    },
+    {
+      "name": "A",
+      "label": "Region A",
+      "format": "CONTENTPICKER",
+      "addTypeList": ["Fields", "Views"],
+      "allowCreatingGroup": true
+    }
+  ]
+}

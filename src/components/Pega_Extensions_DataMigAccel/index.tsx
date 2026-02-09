@@ -252,18 +252,20 @@ function DataMigAccelComponent(props: DashboardProps) {
           const result: {
             pyPageClass: string;
             pyPropertyName: string;
+            pyPropertyMode: string;
             ChildProperties?: { pyPropertyName: string }[];
           } = {
             pyPageClass: item.pyPageClass,
+            pyPropertyMode: item.pyPropertyMode,
             pyPropertyName: item.pyPropertyName
           };
 
           if (Array.isArray(item.ChildProperties)) {
             result.ChildProperties = item.ChildProperties.map((child : any) => ({
-              pyPropertyName: child.pyPropertyName
+              pyPropertyName: child.pyPropertyName,
+              pyPropertyMode: child.pyPropertyMode
             }));
           }
-
           return result;
         });
 

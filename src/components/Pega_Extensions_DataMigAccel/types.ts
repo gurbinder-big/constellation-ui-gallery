@@ -1,6 +1,7 @@
 //mapping
 export type MappingType = {
   id: string;
+  pyPropertyMode: string;
   targetProperty: string;
   sourceTableName: string;
   sourceTableColumns: string[];

@@ -120,7 +120,7 @@ const TableMapping = ({
   return (
     <TableWrapper>
       <Form id='table-mapping-form' ref={formRef} onSubmit={handleSubmit}>
-        <h3>Define Table Relationships/<h3>
+        <h3>Define Table Relationships</h3>
         <Table>
           <thead>
             <tr>
@@ -252,7 +252,6 @@ const TableMapping = ({
             ))}
           </tbody>
         </Table>
-
         <div style={{ marginTop: 16 }}>
           <Button type='button' onClick={addRow}>Add Mapping</Button>
           <Button type='button' onClick={setBack}> Back </Button>

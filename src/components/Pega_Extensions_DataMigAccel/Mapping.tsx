@@ -160,8 +160,23 @@ const Mapping = (props: MappingProps) => {
     ? caseTypeProperties
     : currentRow?.targetPropertyChilds ?? [];
 
+  const updateTargetPropertyInMapping = (rowId : string, mappingId : string, field : string, value : string) => {
+    setFlowData((prev : RowType[]) =>
+      prev.map((row: RowType) =>
+        row.id === rowId
+          ? {
+              ...row,
+              mappings: row.mappings.map((m: MappingType) =>
+                m.id === mappingId ? { ...m, [field]: value, pyPropertyMode : propertyNodeMap[value]?.pyPropertyMode } : m
+              )
+            }
+          : row
+      )
+    );
+  }
+
   const updateMappingField = (rowId : string, mappingId : string, field : string, value : string) => {
-    setFlowData( (prev : RowType[]) =>
+    setFlowData((prev : RowType[]) =>
       prev.map((row: RowType) =>
         row.id === rowId
           ? {
@@ -225,6 +240,7 @@ const Mapping = (props: MappingProps) => {
                   targetProperty: '',
                   sourceTableName: row.sourceTableName,
                   sourceTableColumns: columns,
+                  pyPropertyMode: '',
                   sourceProperty: ''
                 }
               ]
@@ -285,16 +301,17 @@ const Mapping = (props: MappingProps) => {
   };
 
   const propertyNodeMap = useMemo(() => {
-    const buildNodeMap = (
-      nodes: any[] = [],
-      map: Record<string, any> = {}
-    ) => {
+    const map: Record<string, any> = {};
+    const buildNodeMap = (nodes: any[]) => {
       nodes.forEach(node => {
         map[node.pyPropertyName] = node;
+        if (node.ChildProperties && node.ChildProperties.length > 0) {
+          buildNodeMap(node.ChildProperties);
+        }
       });
-      return map;
     };
-    return buildNodeMap(caseTypeProperties);
+    buildNodeMap(caseTypeProperties || []);
+    return map;
   }, [caseTypeProperties]);
 
   const getIncompleteMappings = (mappings: any[]) => {
@@ -499,7 +516,7 @@ const Mapping = (props: MappingProps) => {
                                     className={!mapping.targetProperty ? 'invalid' : ''}
                                     value={mapping.targetProperty}
                                     onChange={e =>
-                                      updateMappingField(
+                                      updateTargetPropertyInMapping(
                                         currentRow.id,
                                         mapping.id,
                                         'targetProperty',

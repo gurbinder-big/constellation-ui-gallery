@@ -100,39 +100,59 @@ const mockData = {
       data: [
         {
           "pyPropertyName": "pyAddress",
+          "pyPageClass": "pyAddress",
+          "pyPropertyMode": "String",
           "ChildProperties": [
             {
+              "pyPageClass": "pyAddress",
+              "pyPropertyMode": "String",
               "pyPropertyName": "child_pycity"
             },
             {
+              "pyPageClass": "pyAddress",
+              "pyPropertyMode": "String",
               "pyPropertyName": "child_pypin"
             }
           ]
         },
         {
           "pyPropertyName": "pyId",
+          "pyPageClass": "pyAddress",
+          "pyPropertyMode": "String",
           "ChildProperties": [
             {
+              "pyPageClass": "pyAddress",
+              "pyPropertyMode": "String",
               "pyPropertyName": "child_pyName"
             },
             {
+              "pyPageClass": "pyAddress",
+              "pyPropertyMode": "String",
               "pyPropertyName": "child_pyId"
             },
             {
+              "pyPageClass": "pyAddress",
+              "pyPropertyMode": "String",
               "pyPropertyName": "child_pyEmail"
             }
           ]
         },
         {
           "pyPropertyName": "pyEmail",
+          "pyPageClass": "pyAddress",
+          "pyPropertyMode": "String",
           "ChildProperties": [
-            {
-              "pyPropertyName": "child_pyemail"
-            },
-            {
-              "pyPropertyName": "child_pyprimary"
-            }
-          ]
+              {
+                "pyPageClass": "pyAddress",
+                "pyPropertyMode": "String",
+                "pyPropertyName": "child_pyemail"
+              },
+              {
+                "pyPageClass": "pyAddress",
+                "pyPropertyMode": "String",
+                "pyPropertyName": "child_pyprimary"
+              }
+            ]
         }
       ]
     }

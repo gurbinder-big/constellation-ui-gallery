@@ -20,26 +20,32 @@ export const PegaExtensionsMessagingEventListener = (props: ComponentProps) => {
       : `repeat(${nCols}, minmax(0, 1fr))`;
 
   useEffect(() => {
-    if (!messageString) return;
+    // if (!messageString) return;
     const pConn = getPConnect();
     const context = pConn.getContextName();
     const caseInstanceKey = pConn.getValue((window as any).PCore.getConstants().CASE_INFO.CASE_INFO_ID);
+    console.log(caseInstanceKey);
 
     const filter = {
-      matcher : messageString,
+      matcher : "CASE_CREATED",
       criteria: {
-        ID: caseInstanceKey
+        caseClass: caseInstanceKey
       },
     };
 
     const subscriptionId = (window as any).PCore.getMessagingServiceManager().subscribe(filter,
-        () => {
+        (a: any) => {
+          console.log('response');
+
+          console.log(a);
           // refresh logic
         },
         context
       );
 
     return () => {
+      console.log('cleanup');
+
       (window as any).PCore.getMessagingServiceManager().unsubscribe(subscriptionId);
     };
   }, [messageString, getPConnect]);

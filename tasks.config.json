@@ -9,7 +9,7 @@
         "devBuild": false,
         "devServerPort": "3030",
         "serverType": "infinity",
-        "server": "https://bits-csins-242.pegatsdemo.com/prweb",
+        "server": "https://pega24.crochetech.com/prweb",
         "clientId": "10095186356008396159",
         "clientSecret_comment": "Needed only when using 'passwordCreds' or 'clientCreds' grantType",
         "clientSecret": "",

@@ -23,7 +23,8 @@
         {
           "name": "messageString",
           "label": "Message string",
-          "format": "TEXT"
+          "format": "TEXT",
+          "required": true
         }
     ],
     "defaultConfig": {

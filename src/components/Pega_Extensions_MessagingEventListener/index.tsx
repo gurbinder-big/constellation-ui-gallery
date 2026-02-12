@@ -20,14 +20,13 @@ export const PegaExtensionsMessagingEventListener = (props: ComponentProps) => {
       : `repeat(${nCols}, minmax(0, 1fr))`;
 
   useEffect(() => {
-    // if (!messageString) return;
     const pConn = getPConnect();
     const context = pConn.getContextName();
     const caseInstanceKey = pConn.getValue((window as any).PCore.getConstants().CASE_INFO.CASE_INFO_ID);
-    console.log(caseInstanceKey);
+    console.log('caseInstanceKey', caseInstanceKey);
 
     const filter = {
-      matcher : "CASE_CREATED",
+      matcher : messageString,
       criteria: {
         caseClass: caseInstanceKey
       },

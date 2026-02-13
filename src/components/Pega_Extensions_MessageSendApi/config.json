@@ -1,0 +1,47 @@
+{
+  "name": "Pega_Extensions_MessageSendApi",
+  "label": "Message Send API",
+  "description": "Component to trigger secure API calls via PegaAuthManager",
+  "organization": "Pega",
+  "version": "4.0.1",
+  "library": "Extensions",
+  "componentKey": "Pega_Extensions_MessageSendApi",
+  "type": "Widget",
+  "subtype": ["PAGE", "CASE"],
+  "subtypeLabel": "PAGE and CASE",
+  "icon": "message-send.svg",
+  "properties": [
+    {
+      "name": "title",
+      "label": "Widget Title",
+      "format": "TEXT"
+    },
+    {
+      "name": "apiEndpoint",
+      "label": "Insights API Endpoint",
+      "format": "TEXT",
+      "helperText": "e.g., /api/dev/v1/insights"
+    },
+    {
+      "name": "buttonLabel",
+      "label": "Action Button Label",
+      "format": "TEXT"
+    },
+    {
+      "label": "Conditions",
+      "format": "GROUP",
+      "properties": [
+        {
+          "name": "visibility",
+          "label": "Visibility",
+          "format": "VISIBILITY"
+        }
+      ]
+    }
+  ],
+  "defaultConfig": {
+    "title": "Secure API Messenger",
+    "apiEndpoint": "/api/dev/v1/insights",
+    "buttonLabel": "Load Secure Insights"
+  }
+}

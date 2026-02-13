@@ -74,6 +74,7 @@
     "@pega/cosmos-react-social": "^8.8.2",
     "@pega/cosmos-react-work": "^8.8.2",
     "gantt-task-react": "^0.3.9",
+    "html-react-parser": "^5.2.17",
     "imask": "^7.6.1",
     "jsbarcode": "^3.12.1",
     "polished": "^4.3.1",

@@ -1,0 +1,33 @@
+{
+  "name": "Pega_Extensions_FieldAsElement",
+  "label": "Field as Element",
+  "description": "Field as Element",
+  "organization": "Pega",
+  "version": "1.0.0",
+  "library": "Extensions",
+  "allowedApplications": [],
+  "componentKey": "Pega_Extensions_FieldAsElement",
+  "type": "Field",
+  "subtype": "Text",
+  "properties": [
+    {
+      "name": "dataPageForCaseInfo",
+      "label": "Data page for Case Info (Should be of page type)",
+      "format": "TEXT"
+    },
+    {
+      "name": "value",
+      "label": "Value",
+      "format": "TEXT"
+    },
+    {
+      "name": "localAction",
+      "label": "Local Action ID",
+      "format": "TEXT"
+    }
+  ],
+  "defaultConfig": {
+    "label": "@L $this.label",
+    "localAction": ""
+  }
+}
